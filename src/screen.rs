@@ -76,6 +76,9 @@ impl Screen {
     // Finally, the function that you've all been waiting for. This guy does all of the
     // hard work of going through the pixels and drawing them on the terminal.
     pub fn present(&self) {
+        // Move to the start of the screen before printing.
+        print!("\x1B[H");
+        
         for i in 0..self.height {
             for j in 0..self.width {
                 let pixel: &Pixel = &self[i][j as usize];
@@ -90,6 +93,8 @@ impl Screen {
                         "\x1B[38;2;{}{}{}m{}{}\x1B[0m",
                         red, green, blue, pixel.shape[0], pixel.shape[1]
                     )
+                } else {
+                    print!("{}{}", pixel.shape[0], pixel.shape[1]);
                 }
 
                 println!("");
