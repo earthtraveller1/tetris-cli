@@ -35,7 +35,31 @@ impl Default for Pixel {
 #[derive(Clone)]
 pub enum Color {
     Default,
+    Basic(u8), // Basic color support. Use for maximum compatibility. Only have 16 colors available.
     RGB(u8, u8, u8),
+}
+
+pub mod colors {
+    pub mod basic {
+        pub const BLACK: u8 = 30;
+        pub const RED: u8 = 31;
+        pub const GREEN: u8 = 32;
+        pub const YELLOW: u8 = 33;
+        pub const BLUE: u8 = 34;
+        pub const MAGENTA: u8 = 35;
+        pub const CYAN: u8 = 36;
+        pub const WHITE: u8 = 37;
+        
+        // Bright colors.
+        pub const BRIGH_BLACK: u8 = 90;
+        pub const BRIGHT_RED: u8 = 91;
+        pub const BRIGHT_GREEN: u8 = 92;
+        pub const BRIGHT_YELLOW: u8 = 93;
+        pub const BRIGHT_BLUE: u8 = 94;
+        pub const BRIGHT_MAGENTA: u8 = 95;
+        pub const BRIGHT_CYAN: u8 = 96;
+        pub const BRIGHT_WHITE: u8 = 97;
+    }
 }
 
 // A basic abstraction of a screen that makes it easier to render bitmap graphics
@@ -103,6 +127,8 @@ impl Screen {
                         "\x1B[38;2;{};{};{}m{}{}\x1B[0m",
                         red, green, blue, pixel.shape[0], pixel.shape[1]
                     )
+                } else if let Color::Basic(code) = pixel.color {
+                    print!("\x1B[{}m{}{}\x1B[0m", code, pixel.shape[0], pixel.shape[1]);
                 } else {
                     print!("{}{}", pixel.shape[0], pixel.shape[1]);
                 }
