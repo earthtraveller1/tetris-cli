@@ -1,4 +1,4 @@
-use std::ops::{Index, IndexMut, Mul, Add};
+use std::ops::{Add, Index, IndexMut, Mul};
 
 // A basic representation of a "pixel"
 #[derive(Clone)]
@@ -7,16 +7,16 @@ pub struct Pixel {
     // It is a two-element array because every "pixel" takes up two characters on the
     // terminal.
     shape: [char; 2],
-    
+
     // The color of the pixel
-    color: Color
+    color: Color,
 }
 
 impl Default for Pixel {
     fn default() -> Self {
         Pixel {
             shape: [' ', ' '],
-            color: Color::Default
+            color: Color::Default,
         }
     }
 }
@@ -25,7 +25,7 @@ impl Default for Pixel {
 #[derive(Clone)]
 pub enum Color {
     Default,
-    RGB(u8, u8, u8)
+    RGB(u8, u8, u8),
 }
 
 // A basic abstraction of a screen that makes it easier to render bitmap graphics
@@ -36,7 +36,7 @@ pub struct Screen {
 
     // Used a single-dimensional vector instead of a vector of vectors to improve
     // performance.
-    pixels: Vec<Pixel>
+    pixels: Vec<Pixel>,
 }
 
 impl Screen {
@@ -45,8 +45,32 @@ impl Screen {
         Ok(Screen {
             width,
             height,
-            pixels: vec![Pixel::default(); (width * height).try_into()?]
+            pixels: vec![Pixel::default(); (width * height).try_into()?],
         })
+    }
+
+    // Clears the entire screen. Basically, reset everyting back to spaces.
+    pub fn clear(&mut self) {
+        // This should be self-explanatory, but if you're the kind of person who
+        // is too lazy to read any code, what this basically does is it iterates
+        // over all the pixels and resets them.
+        for pixel in self.pixels.iter_mut() {
+            *pixel = Pixel::default()
+        }
+    }
+
+    // This function would likely never be used in this program but I added it here
+    // anyways for completeness's sake. And with the hope that, in the future, I might
+    // be able to copy and paste this file for another project.
+    //
+    // By the way, after resizing the screen would be blank so...
+    pub fn resize(&mut self, new_width: u32, new_height: u32) {
+        self.width = new_width;
+        self.height = new_height;
+        self.pixels.resize(
+            (new_width * new_height).try_into().unwrap(),
+            Pixel::default(),
+        );
     }
 }
 
@@ -59,7 +83,7 @@ impl Index<u32> for Screen {
         // The start and end of the slice.
         let start: usize = (index * self.height).try_into().unwrap();
         let end: usize = ((index + 1) * self.height).try_into().unwrap();
-        
+
         &self.pixels[start..end]
     }
 }
@@ -74,12 +98,12 @@ impl IndexMut<u32> for Screen {
         // The start and end of the slice.
         let start: usize = (index * self.height).try_into().unwrap();
         let end: usize = ((index + 1) * self.height).try_into().unwrap();
-        
+
         // By the way, the expected behaviour of the index operator is that it panics
         // if it goes out of bound, which is why I'm calling `unwrap()` here. I should
-        // probably write proper error messages with `expect()`, but I'm too lazy and 
+        // probably write proper error messages with `expect()`, but I'm too lazy and
         // this is a rather small project so it doesn't matter.
-        
+
         &mut self.pixels[start..end]
     }
 }
