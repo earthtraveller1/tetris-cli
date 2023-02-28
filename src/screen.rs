@@ -12,6 +12,16 @@ pub struct Pixel {
     color: Color,
 }
 
+impl Pixel {
+    pub fn set_shape(&mut self, a: char, b: char) {
+        self.shape = [a, b];
+    }
+    
+    pub fn set_color(&mut self, new_color: Color) {
+        self.color = new_color;
+    }
+}
+
 impl Default for Pixel {
     fn default() -> Self {
         Pixel {
