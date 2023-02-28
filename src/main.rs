@@ -11,7 +11,7 @@ fn main() {
             pixel.set_shape('$', '$');
             
             if i == j {
-                pixel.set_color(screen::Color::RGB(255, 0, 255));
+                pixel.set_color(screen::Color::Basic(screen::colors::basic::GREEN));
             }
         }
     }
