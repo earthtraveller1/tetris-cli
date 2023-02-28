@@ -100,7 +100,7 @@ impl Screen {
                 // https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit
                 if let Color::RGB(red, green, blue) = pixel.color {
                     print!(
-                        "\x1B[38;2;{}{}{}m{}{}\x1B[0m",
+                        "\x1B[38;2;{};{};{}m{}{}\x1B[0m",
                         red, green, blue, pixel.shape[0], pixel.shape[1]
                     )
                 } else {
