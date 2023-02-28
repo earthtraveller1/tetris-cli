@@ -72,6 +72,30 @@ impl Screen {
             Pixel::default(),
         );
     }
+
+    // Finally, the function that you've all been waiting for. This guy does all of the
+    // hard work of going through the pixels and drawing them on the terminal.
+    pub fn present(&self) {
+        for i in 0..self.height {
+            for j in 0..self.width {
+                let pixel: &Pixel = &self[i][j as usize];
+                
+                // I'm sorry that this is way too hard to read but basically it's text
+                // colors that supports RGB. I don't have time to explain this but I can
+                // give you the link if you would like.
+                //
+                // https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit
+                if let Color::RGB(red, green, blue) = pixel.color {
+                    print!(
+                        "\x1B[38;2;{}{}{}m{}{}\x1B[0m",
+                        red, green, blue, pixel.shape[0], pixel.shape[1]
+                    )
+                }
+
+                println!("");
+            }
+        }
+    }
 }
 
 impl Index<u32> for Screen {
