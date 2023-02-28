@@ -16,7 +16,7 @@ impl Pixel {
     pub fn set_shape(&mut self, a: char, b: char) {
         self.shape = [a, b];
     }
-    
+
     pub fn set_color(&mut self, new_color: Color) {
         self.color = new_color;
     }
@@ -88,11 +88,11 @@ impl Screen {
     pub fn present(&self) {
         // Move to the start of the screen before printing.
         print!("\x1B[H");
-        
+
         for i in 0..self.height {
             for j in 0..self.width {
                 let pixel: &Pixel = &self[i][j as usize];
-                
+
                 // I'm sorry that this is way too hard to read but basically it's text
                 // colors that supports RGB. I don't have time to explain this but I can
                 // give you the link if you would like.
@@ -106,9 +106,9 @@ impl Screen {
                 } else {
                     print!("{}{}", pixel.shape[0], pixel.shape[1]);
                 }
-
-                println!("");
             }
+
+            println!("");
         }
     }
 }
