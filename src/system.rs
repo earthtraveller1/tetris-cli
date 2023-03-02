@@ -1,3 +1,5 @@
+use core::ffi::c_int;
+
 // System headers, of course, doesn't use standard Rust naming
 // conventions.
 #[allow(nonstandard_style)]
@@ -7,3 +9,7 @@
 pub mod termios;
 #[cfg(target_family = "unix")]
 pub mod unistd;
+
+extern "C" {
+    pub fn getchar() -> c_int;
+}
