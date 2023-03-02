@@ -4,17 +4,23 @@ mod system;
 use screen::Screen;
 
 fn main() {
-    let mut screen = Screen::new(12, 12).unwrap();
-    for i in 0..12 {
-        for j in 0..12 {
-            let pixel = &mut screen[i][j as usize];
+    let mut screen = Screen::new(16, 16).unwrap();
 
-            pixel.set_shape('$', '$');
+    let player_x = 8;
+    let mut player_y = 8;
 
-            if i == j {
-                pixel.set_color(screen::Color::Basic(screen::colors::basic::GREEN));
+    loop {
+        if let Some(input) = Screen::read_input() {
+            match input {
+                'w' => player_y += 1,
+                's' => player_y -= 1,
+                _ => (),
             }
         }
+
+        screen.clear();
+
+        screen[player_x][player_y].set_shape('#', '#');
+        screen.present();
     }
-    screen.present();
 }
