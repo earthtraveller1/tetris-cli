@@ -1,8 +1,11 @@
-use core::ffi::c_int;
-
 // System headers, of course, doesn't use standard Rust naming
 // conventions.
-#[allow(nonstandard_style)]
+#![allow(nonstandard_style)]
+
+// Not all of the functions in the headers will be used so...
+#![allow(dead_code)]
+
+use core::ffi::c_int;
 
 // A binding to system-specific functionalities.
 #[cfg(target_family = "unix")]
