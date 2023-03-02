@@ -4,4 +4,6 @@
 
 // A binding to system-specific functionalities.
 #[cfg(target_family = "unix")]
-mod termios;
+pub mod termios;
+#[cfg(target_family = "unix")]
+pub mod unistd;
