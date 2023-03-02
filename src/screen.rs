@@ -1,3 +1,4 @@
+use super::system::{termios as term, unistd};
 use std::ops::{Add, Index, IndexMut, Mul};
 
 // A basic representation of a "pixel"
@@ -49,7 +50,7 @@ pub mod colors {
         pub const MAGENTA: u8 = 35;
         pub const CYAN: u8 = 36;
         pub const WHITE: u8 = 37;
-        
+
         // Bright colors.
         pub const BRIGH_BLACK: u8 = 90;
         pub const BRIGHT_RED: u8 = 91;
@@ -76,6 +77,19 @@ pub struct Screen {
 impl Screen {
     // Creates a blank screen with a certain width and height.
     pub fn new(width: u32, height: u32) -> Result<Screen, std::num::TryFromIntError> {
+        // Not very clean, but this is very hacky so don't get mad.
+        #[cfg(target_family = "unix")]
+        unsafe {
+            let mut terminal_settings = term::termios::default();
+            term::tcgetattr(unistd::STDIN_FILENO as i32, &mut terminal_settings);
+            terminal_settings.c_lflag &= !term::ICANON;
+            term::tcsetattr(
+                unistd::STDIN_FILENO as i32,
+                term::TCSANOW as i32,
+                &terminal_settings,
+            );
+        }
+
         Ok(Screen {
             width,
             height,
@@ -170,5 +184,23 @@ impl IndexMut<u32> for Screen {
         // this is a rather small project so it doesn't matter.
 
         &mut self.pixels[start..end]
+    }
+}
+
+// Only UNIX systems needs to perform some shutdown actions.
+// Windows has their own function for non-blocking input.
+#[cfg(target_family = "unix")]
+impl Drop for Screen {
+    fn drop(&mut self) {
+        unsafe {
+            let mut terminal_settings = term::termios::default();
+            term::tcgetattr(unistd::STDIN_FILENO as i32, &mut terminal_settings);
+            terminal_settings.c_lflag |= term::ICANON;
+            term::tcsetattr(
+                unistd::STDIN_FILENO as i32,
+                term::ICANON as i32,
+                &terminal_settings,
+            );
+        }
     }
 }
