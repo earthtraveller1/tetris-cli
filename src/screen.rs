@@ -112,13 +112,21 @@ impl Screen {
     // be able to copy and paste this file for another project.
     //
     // By the way, after resizing the screen would be blank so...
-    pub fn resize(&mut self, new_width: u32, new_height: u32) {
+    pub fn _resize(&mut self, new_width: u32, new_height: u32) {
         self.width = new_width;
         self.height = new_height;
         self.pixels.resize(
             (new_width * new_height).try_into().unwrap(),
             Pixel::default(),
         );
+    }
+
+    // Basically, read whatever key the user has pressed from the terminal
+    // This is the UNIX version. The Windows version uses Microsoft's dedicated
+    // function instead of getchar.
+    #[cfg(target_family = "unix")]
+    pub fn read_input() -> Option<char> {
+        unsafe { char::from_u32(crate::system::getchar().try_into().ok()?) }
     }
 
     // Finally, the function that you've all been waiting for. This guy does all of the
