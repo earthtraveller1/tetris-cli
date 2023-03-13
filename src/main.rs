@@ -19,8 +19,8 @@ fn main() {
     while running {
         if let Some(input) = Screen::read_input() {
             match input {
-                'w' => player_y += 1,
-                's' => player_y -= 1,
+                'w' => if player_y < (screen.width() - 1).try_into().unwrap() { player_y += 1 },
+                's' => if player_y > 0 { player_y -= 1 },
                 'q' => running = false,
                 _ => (),
             }
