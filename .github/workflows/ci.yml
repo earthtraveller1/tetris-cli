@@ -1,0 +1,36 @@
+name: Continuous Integration
+
+# Run this job every time something is pushed
+on: [push]
+
+jobs:
+  build:
+    # Enable Matrix builds
+    strategy:
+      matrix:
+        targetsystem: [ubuntu-latest, windows-latest, macos-latest]
+    
+    runs-on: ${{ matrix.targetsystem }}
+    
+    steps:
+      # Checkout the repository before starting the build process
+      - uses: actions/checkout@v3
+
+      - name: cargo build
+        run: cargo build
+  
+  # Also try building in release mode, just in case.
+  build-release:
+    # Enable Matrix builds
+    strategy:
+      matrix:
+        targetsystem: [ubuntu-latest, windows-latest, macos-latest]
+    
+    runs-on: ${{ matrix.targetsystem }}
+    
+    steps:
+      # Checkout the repository before starting the build process
+      - uses: actions/checkout@v3
+
+      - name: cargo build
+        run: cargo build --release
