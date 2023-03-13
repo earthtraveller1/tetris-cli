@@ -97,6 +97,14 @@ impl Screen {
             pixels: vec![Pixel::default(); (width * height).try_into()?],
         })
     }
+    
+    // Returns the width of the screen. This can be used by clients to ensure
+    // that they don't try to write to pixels that are out of bounds, which
+    // can cause the program to panic.
+    pub fn width(&self) -> u32 { self.width }
+    
+    // Returns the height of the screen. Same use case as the width() function
+    pub fn height(&self) -> u32 { self.height }
 
     // Clears the entire screen. Basically, reset everyting back to spaces.
     pub fn clear(&mut self) {
