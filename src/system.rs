@@ -13,6 +13,10 @@ pub mod termios;
 #[cfg(target_family = "unix")]
 pub mod unistd;
 
+// Windows stuff.
+#[cfg(target_family = "windows")]
+pub mod conio;
+
 extern "C" {
     pub fn getchar() -> c_int;
 }
