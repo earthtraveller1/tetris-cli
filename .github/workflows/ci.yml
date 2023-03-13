@@ -13,6 +13,9 @@ jobs:
     runs-on: ${{ matrix.targetsystem }}
     
     steps:
+      # Checkout the repository before starting the build process
+      - uses: action/checkout@v3
+
       - name: cargo build
         run: cargo build
   
@@ -26,5 +29,8 @@ jobs:
     runs-on: ${{ matrix.targetsystem }}
     
     steps:
+      # Checkout the repository before starting the build process
+      - uses: action/checkout@v3
+
       - name: cargo build
         run: cargo build --release
