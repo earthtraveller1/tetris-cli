@@ -14,6 +14,8 @@ fn main() {
 
     let mut running = true;
     
+    let mut color = screen::colors::basic::RED;
+    
     while running {
         if let Some(input) = Screen::read_input() {
             match input {
@@ -23,10 +25,17 @@ fn main() {
                 _ => (),
             }
         }
+        
+        if color == 37 {
+            color = 30;
+        } else {
+            color += 1;
+        }
 
         screen.clear();
 
         screen[player_x][player_y].set_shape('#', '#');
+        screen[player_x][player_y].set_color(screen::Color::Basic(color));
         screen.present();
     }
 }
