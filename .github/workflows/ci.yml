@@ -14,7 +14,7 @@ jobs:
     
     steps:
       # Checkout the repository before starting the build process
-      - uses: action/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: cargo build
         run: cargo build
@@ -30,7 +30,7 @@ jobs:
     
     steps:
       # Checkout the repository before starting the build process
-      - uses: action/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: cargo build
         run: cargo build --release
