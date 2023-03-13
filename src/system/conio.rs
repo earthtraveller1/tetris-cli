@@ -336,6 +336,7 @@ extern "C" {
 extern "C" {
     pub fn _kbhit() -> ::std::os::raw::c_int;
 }
+#[link(name = "ucrt")]
 extern "C" {
     pub fn _getch() -> ::std::os::raw::c_int;
 }

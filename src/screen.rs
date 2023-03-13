@@ -134,7 +134,7 @@ impl Screen {
     // thing, but for windows.
     #[cfg(target_family = "windows")]
     pub fn read_input() -> Option<char> {
-        unsafe { char::from_u32(crate::system::conio::getch().try_into().ok()?) }
+        unsafe { char::from_u32(crate::system::conio::_getch().try_into().ok()?) }
     }
 
     // Finally, the function that you've all been waiting for. This guy does all of the
