@@ -204,6 +204,15 @@ impl Screen {
             self[real_x as u32][real_y as usize] = shape.fill_pixel.clone();
         })
     }
+    
+    // Fills the screen with a specific color.
+    pub fn fill_with_pixel(&mut self, pixel: &Pixel) {
+        for i in 0..self.width {
+            for j in 0..self.height {
+                self[i][j as usize] = pixel.clone();
+            }
+        }
+    }
 }
 
 impl Index<u32> for Screen {
