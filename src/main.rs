@@ -57,6 +57,10 @@ fn main() {
         }
 
         screen.clear();
+        screen.fill_with_pixel(&screen::Pixel {
+            shape: [unicode::LIGHT_SHADE, ' '],
+            color:screen::Color::Basic(screen::colors::basic::BRIGH_BLACK),
+        });
         screen.draw_shape(&player_shape, player_x, player_y);
 
         screen.present();
