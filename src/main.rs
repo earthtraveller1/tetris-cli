@@ -4,6 +4,22 @@ mod system;
 use screen::Screen;
 use screen::Shape;
 
+// Unicode literals that might be useful in future.
+mod unicode {
+    pub const FULL_BLOCK: char = '\u{2588}';
+    pub const LIGHT_SHADE: char = '\u{2591}';
+
+    // Basic box drawing.
+    pub const BOX_DRAWINGS_LIGHT_HORIZONTAL: char = '\u{2500}';
+    pub const BOX_DRAWINGS_LIGHT_VERTICAL: char = '\u{2502}';
+
+    // Box drawing corners
+    pub const BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT: char = '\u{250C}';
+    pub const BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT: char = '\u{2510}';
+    pub const BOX_DRAWINGS_LIGHT_UP_AND_RIGHT: char = '\u{2510}';
+    pub const BOX_DRAWINGS_LIGHT_UP_AND_LEFT: char = '\u{2518}';
+}
+
 fn main() {
     let mut screen = Screen::new(16, 16).unwrap();
 
@@ -13,7 +29,7 @@ fn main() {
     let player_shape = Shape {
         pixels: vec![(0, 0), (0, 1), (0, -1), (-1, 0), (1, 0)],
         fill_pixel: screen::Pixel {
-            shape: ['#', '#'],
+            shape: [unicode::FULL_BLOCK, unicode::FULL_BLOCK],
             color: screen::Color::Basic(screen::colors::basic::GREEN),
         },
     };
