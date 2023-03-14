@@ -1,3 +1,6 @@
+// This file probably shouldn't be called "screen" since it contains a lot more than
+// just the screen abstraction. It also contains the rendering logic.
+
 #[cfg(target_family = "unix")]
 use super::system::{termios as term, unistd};
 use std::ops::{Add, Index, IndexMut, Mul};
@@ -174,6 +177,42 @@ impl Screen {
 
             println!("");
         }
+    }
+}
+
+// A struct for a shape.
+pub struct Shape {
+    // The squares that are taken up by the shape, relative to the
+    // shape itself.
+    pixels: Vec<(i16, i16)>,
+    // The pixel to fill the shape with.
+    fill_pixel: Pixel
+}
+
+// Alright, so for the purpose of organization, I'm going to put
+// the high-level rendering logics into a different implementation
+// block.
+impl Screen {
+    // Draws a shape.
+    pub fn draw_shape(&mut self, shape: &Shape, x_pos: u16, y_pos: u16) {
+        let x_pos: i16 = x_pos.try_into().unwrap();
+        let y_pos: i16 = y_pos.try_into().unwrap();
+
+        shape.pixels.iter().for_each(|(pixel_x, pixel_y)| {
+            let real_x: i16 = x_pos + *pixel_x;
+            let real_y: i16 = y_pos + *pixel_y;
+
+            // Any pixels that are out of bounds are automatically clipped off.
+            // Also, the casting is safe as the || operators are short-circuited.
+            if (real_x < 0 || real_x as u32 >= self.width) || (real_y < 0 || real_y as u32 >= self.height) {
+                return;
+            }
+            
+            // Both u32 and usize are larger than i16 and real_x and real_y are both 
+            // guaranteed to be positive by this point, so this is safe (at least it
+            // should be).
+            self[real_x as u32][real_y as usize] = shape.fill_pixel.clone();
+        })
     }
 }
 
