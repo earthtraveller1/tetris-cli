@@ -11,20 +11,10 @@ pub struct Pixel {
     // The shape of the pixel, as in what is printed out when the pixel is displayed.
     // It is a two-element array because every "pixel" takes up two characters on the
     // terminal.
-    shape: [char; 2],
+    pub shape: [char; 2],
 
     // The color of the pixel
-    color: Color,
-}
-
-impl Pixel {
-    pub fn set_shape(&mut self, a: char, b: char) {
-        self.shape = [a, b];
-    }
-
-    pub fn set_color(&mut self, new_color: Color) {
-        self.color = new_color;
-    }
+    pub color: Color,
 }
 
 impl Default for Pixel {
@@ -184,9 +174,9 @@ impl Screen {
 pub struct Shape {
     // The squares that are taken up by the shape, relative to the
     // shape itself.
-    pixels: Vec<(i16, i16)>,
+    pub pixels: Vec<(i16, i16)>,
     // The pixel to fill the shape with.
-    fill_pixel: Pixel
+    pub fill_pixel: Pixel
 }
 
 // Alright, so for the purpose of organization, I'm going to put
