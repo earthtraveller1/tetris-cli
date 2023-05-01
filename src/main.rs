@@ -16,7 +16,7 @@ mod unicode {
     // Box drawing corners
     pub const BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT: char = '\u{250C}';
     pub const BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT: char = '\u{2510}';
-    pub const BOX_DRAWINGS_LIGHT_UP_AND_RIGHT: char = '\u{2510}';
+    pub const BOX_DRAWINGS_LIGHT_UP_AND_RIGHT: char = '\u{2514}';
     pub const BOX_DRAWINGS_LIGHT_UP_AND_LEFT: char = '\u{2518}';
 }
 
