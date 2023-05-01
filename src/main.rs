@@ -20,52 +20,79 @@ mod unicode {
     pub const BOX_DRAWINGS_LIGHT_UP_AND_LEFT: char = '\u{2518}';
 }
 
-fn main() {
-    let mut screen = Screen::new(16, 16).unwrap();
+struct Game {
+    screen: Screen,
+    running: bool,
 
-    let player_x = 8;
-    let mut player_y = 8;
+    player_shape: Shape,
 
-    let player_shape = Shape {
-        pixels: vec![(0, 0), (0, 1), (0, -1), (-1, 0), (1, 0)],
-        fill_pixel: screen::Pixel {
-            shape: [unicode::FULL_BLOCK, unicode::FULL_BLOCK],
-            color: screen::Color::Basic(screen::colors::basic::GREEN),
-        },
-    };
+    player_x: u16,
+    player_y: u16,
+}
 
-    screen.draw_box(0, 0, 8, 8);
+impl Game {
+    fn new() -> Game {
+        Game {
+            screen: Screen::new(16, 16).unwrap(),
+            player_shape: Shape {
+                pixels: vec![(0, 0), (0, 1), (0, -1), (-1, 0), (1, 0)],
+                fill_pixel: screen::Pixel {
+                    shape: [unicode::FULL_BLOCK, unicode::FULL_BLOCK],
+                    color: screen::Color::Basic(screen::colors::basic::GREEN),
+                },
+            },
+            running: true,
+            player_x: 8,
+            player_y: 8,
+        }
+    }
 
-    screen.draw_shape(&player_shape, player_x, player_y);
-    screen.present();
-
-    let mut running = true;
-    while running {
+    fn update(&mut self) {
         if let Some(input) = Screen::read_input() {
             match input {
                 'w' => {
-                    if player_y < (screen.width() - 1).try_into().unwrap() {
-                        player_y += 1
+                    if self.player_y < (self.screen.width() - 1).try_into().unwrap() {
+                        self.player_y += 1
                     }
                 }
                 's' => {
-                    if player_y > 0 {
-                        player_y -= 1
+                    if self.player_y > 0 {
+                        self.player_y -= 1
                     }
                 }
-                'q' => running = false,
+                'q' => self.running = false,
                 _ => (),
             }
         }
+    }
 
-        screen.clear();
-        screen.fill_with_pixel(&screen::Pixel {
+    fn render(&mut self) {
+        self.screen.clear();
+        self.screen.fill_with_pixel(&screen::Pixel {
             shape: [unicode::LIGHT_SHADE, ' '],
-            color:screen::Color::Basic(screen::colors::basic::BRIGH_BLACK),
+            color: screen::Color::Basic(screen::colors::basic::BRIGH_BLACK),
         });
-        screen.draw_box(0, 0, 8, 8);
-        screen.draw_shape(&player_shape, player_x, player_y);
+        self.screen.draw_box(0, 0, 8, 8);
+        self.screen
+            .draw_shape(&self.player_shape, self.player_x, self.player_y);
 
-        screen.present();
+        self.screen.present();
+    }
+
+    fn is_running(&self) -> bool {
+        self.running
+    }
+}
+
+fn main() {
+    let mut game = Game::new();
+
+    // Render the first frame so that the user isn't staring at a blank
+    // screen on startup.
+    game.render();
+
+    while game.is_running() {
+        game.update();
+        game.render();
     }
 }
