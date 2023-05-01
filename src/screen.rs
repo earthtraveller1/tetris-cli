@@ -63,6 +63,8 @@ pub struct Screen {
     width: u32,
     height: u32,
 
+    has_cursor_moved: bool,
+
     // Used a single-dimensional vector instead of a vector of vectors to improve
     // performance.
     pixels: Vec<Pixel>,
@@ -87,6 +89,7 @@ impl Screen {
         Ok(Screen {
             width,
             height,
+            has_cursor_moved: false,
             pixels: vec![Pixel::default(); (width * height).try_into()?],
         })
     }
@@ -144,9 +147,13 @@ impl Screen {
 
     // Finally, the function that you've all been waiting for. This guy does all of the
     // hard work of going through the pixels and drawing them on the terminal.
-    pub fn present(&self) {
+    pub fn present(&mut self) {
+        if self.has_cursor_moved {
+            println!("\x1B[{}D\x1B[{}A", self.width, self.height + 1);
+        }
+
         // Move to the start of the screen before printing.
-        print!("\x1B[H");
+        // print!("\x1B[H");
 
         for i in 0..self.height {
             for j in 0..self.width {
@@ -171,6 +178,8 @@ impl Screen {
 
             println!("");
         }
+
+        self.has_cursor_moved = true;
     }
 }
 
