@@ -3,7 +3,7 @@
 
 #[cfg(target_family = "unix")]
 use super::system::{termios as term, unistd};
-use std::ops::{Add, Index, IndexMut, Mul};
+use std::ops::{Index, IndexMut};
 
 // A basic representation of a "pixel"
 #[derive(Clone)]
@@ -90,14 +90,18 @@ impl Screen {
             pixels: vec![Pixel::default(); (width * height).try_into()?],
         })
     }
-    
+
     // Returns the width of the screen. This can be used by clients to ensure
     // that they don't try to write to pixels that are out of bounds, which
     // can cause the program to panic.
-    pub fn width(&self) -> u32 { self.width }
-    
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
     // Returns the height of the screen. Same use case as the width() function
-    pub fn height(&self) -> u32 { self.height }
+    pub fn height(&self) -> u32 {
+        self.height
+    }
 
     // Clears the entire screen. Basically, reset everyting back to spaces.
     pub fn clear(&mut self) {
@@ -130,7 +134,7 @@ impl Screen {
     pub fn read_input() -> Option<char> {
         unsafe { char::from_u32(crate::system::getchar().try_into().ok()?) }
     }
-    
+
     // The Windows version of read input. Basically does the exact same
     // thing, but for windows.
     #[cfg(target_family = "windows")]
@@ -176,7 +180,7 @@ pub struct Shape {
     // shape itself.
     pub pixels: Vec<(i16, i16)>,
     // The pixel to fill the shape with.
-    pub fill_pixel: Pixel
+    pub fill_pixel: Pixel,
 }
 
 // Alright, so for the purpose of organization, I'm going to put
@@ -194,17 +198,19 @@ impl Screen {
 
             // Any pixels that are out of bounds are automatically clipped off.
             // Also, the casting is safe as the || operators are short-circuited.
-            if (real_x < 0 || real_x as u32 >= self.width) || (real_y < 0 || real_y as u32 >= self.height) {
+            if (real_x < 0 || real_x as u32 >= self.width)
+                || (real_y < 0 || real_y as u32 >= self.height)
+            {
                 return;
             }
-            
-            // Both u32 and usize are larger than i16 and real_x and real_y are both 
+
+            // Both u32 and usize are larger than i16 and real_x and real_y are both
             // guaranteed to be positive by this point, so this is safe (at least it
             // should be).
             self[real_x as u32][real_y as usize] = shape.fill_pixel.clone();
         })
     }
-    
+
     // Fills the screen with a specific color.
     pub fn fill_with_pixel(&mut self, pixel: &Pixel) {
         for i in 0..self.width {
@@ -212,6 +218,86 @@ impl Screen {
                 self[i][j as usize] = pixel.clone();
             }
         }
+    }
+
+    // Draws a box. Duh.
+    pub fn draw_box(&mut self, x_pos: u16, y_pos: u16, width: u16, height: u16) {
+        let left = x_pos;
+        let right = x_pos + width;
+
+        let top = y_pos;
+        let bottom = y_pos + height;
+
+        // There are probably better ways to do this with iterators but I don't
+        // know them so please let me know if you do know them. :ye:
+
+        // Draw the horizontal lines
+        for i in left..right {
+            use crate::unicode::BOX_DRAWINGS_LIGHT_HORIZONTAL;
+
+            self[i.into()][<u16 as Into<usize>>::into(top)] = Pixel {
+                shape: [BOX_DRAWINGS_LIGHT_HORIZONTAL, BOX_DRAWINGS_LIGHT_HORIZONTAL],
+                color: Color::Default,
+            };
+
+            self[i.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
+                shape: [BOX_DRAWINGS_LIGHT_HORIZONTAL, BOX_DRAWINGS_LIGHT_HORIZONTAL],
+                color: Color::Default,
+            };
+        }
+
+        // Draw the vertical lines.
+        for i in left..right {
+            use crate::unicode::BOX_DRAWINGS_LIGHT_VERTICAL;
+
+            self[left.into()][<u16 as Into<usize>>::into(i)] = Pixel {
+                shape: [BOX_DRAWINGS_LIGHT_VERTICAL, BOX_DRAWINGS_LIGHT_VERTICAL],
+                color: Color::Default,
+            };
+
+            self[right.into()][<u16 as Into<usize>>::into(i)] = Pixel {
+                shape: [BOX_DRAWINGS_LIGHT_VERTICAL, BOX_DRAWINGS_LIGHT_VERTICAL],
+                color: Color::Default,
+            };
+        }
+
+        use crate::unicode::{
+            BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT, BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT,
+            BOX_DRAWINGS_LIGHT_UP_AND_LEFT, BOX_DRAWINGS_LIGHT_UP_AND_RIGHT,
+        };
+
+        // Draw the corners.
+        self[left.into()][<u16 as Into<usize>>::into(top)] = Pixel {
+            shape: [
+                BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT,
+                BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT,
+            ],
+            color: Color::Default,
+        };
+
+        self[right.into()][<u16 as Into<usize>>::into(top)] = Pixel {
+            shape: [
+                BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT,
+                BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT,
+            ],
+            color: Color::Default,
+        };
+
+        self[left.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
+            shape: [
+                BOX_DRAWINGS_LIGHT_UP_AND_RIGHT,
+                BOX_DRAWINGS_LIGHT_UP_AND_RIGHT,
+            ],
+            color: Color::Default,
+        };
+
+        self[right.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
+            shape: [
+                BOX_DRAWINGS_LIGHT_UP_AND_LEFT,
+                BOX_DRAWINGS_LIGHT_UP_AND_LEFT,
+            ],
+            color: Color::Default,
+        };
     }
 }
 
