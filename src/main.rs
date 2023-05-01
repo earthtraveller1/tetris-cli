@@ -34,6 +34,8 @@ fn main() {
         },
     };
 
+    screen.draw_box(0, 0, 8, 8);
+
     screen.draw_shape(&player_shape, player_x, player_y);
     screen.present();
 
@@ -61,6 +63,7 @@ fn main() {
             shape: [unicode::LIGHT_SHADE, ' '],
             color:screen::Color::Basic(screen::colors::basic::BRIGH_BLACK),
         });
+        screen.draw_box(0, 0, 8, 8);
         screen.draw_shape(&player_shape, player_x, player_y);
 
         screen.present();
