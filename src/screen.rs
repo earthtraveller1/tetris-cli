@@ -235,12 +235,12 @@ impl Screen {
         for i in left..right {
             use crate::unicode::BOX_DRAWINGS_LIGHT_HORIZONTAL;
 
-            self[i.into()][<u16 as Into<usize>>::into(top)] = Pixel {
+            self[top.into()][<u16 as Into<usize>>::into(i)] = Pixel {
                 shape: [BOX_DRAWINGS_LIGHT_HORIZONTAL, BOX_DRAWINGS_LIGHT_HORIZONTAL],
                 color: Color::Default,
             };
 
-            self[i.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
+            self[bottom.into()][<u16 as Into<usize>>::into(i)] = Pixel {
                 shape: [BOX_DRAWINGS_LIGHT_HORIZONTAL, BOX_DRAWINGS_LIGHT_HORIZONTAL],
                 color: Color::Default,
             };
@@ -250,13 +250,13 @@ impl Screen {
         for i in left..right {
             use crate::unicode::BOX_DRAWINGS_LIGHT_VERTICAL;
 
-            self[left.into()][<u16 as Into<usize>>::into(i)] = Pixel {
-                shape: [BOX_DRAWINGS_LIGHT_VERTICAL, BOX_DRAWINGS_LIGHT_VERTICAL],
+            self[i.into()][<u16 as Into<usize>>::into(left)] = Pixel {
+                shape: [' ', BOX_DRAWINGS_LIGHT_VERTICAL],
                 color: Color::Default,
             };
 
-            self[right.into()][<u16 as Into<usize>>::into(i)] = Pixel {
-                shape: [BOX_DRAWINGS_LIGHT_VERTICAL, BOX_DRAWINGS_LIGHT_VERTICAL],
+            self[i.into()][<u16 as Into<usize>>::into(right)] = Pixel {
+                shape: [BOX_DRAWINGS_LIGHT_VERTICAL, ' '],
                 color: Color::Default,
             };
         }
@@ -267,34 +267,38 @@ impl Screen {
         };
 
         // Draw the corners.
-        self[left.into()][<u16 as Into<usize>>::into(top)] = Pixel {
+        // top left
+        self[top.into()][<u16 as Into<usize>>::into(left)] = Pixel {
             shape: [
-                BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT,
+                ' ',
                 BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT,
             ],
             color: Color::Default,
         };
 
-        self[right.into()][<u16 as Into<usize>>::into(top)] = Pixel {
+        // top right
+        self[top.into()][<u16 as Into<usize>>::into(right)] = Pixel {
             shape: [
                 BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT,
-                BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT,
+                ' ',
             ],
             color: Color::Default,
         };
 
-        self[left.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
+        // bottom left
+        self[bottom.into()][<u16 as Into<usize>>::into(left)] = Pixel {
             shape: [
-                BOX_DRAWINGS_LIGHT_UP_AND_RIGHT,
+                ' ',
                 BOX_DRAWINGS_LIGHT_UP_AND_RIGHT,
             ],
             color: Color::Default,
         };
 
-        self[right.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
+        // bottom right
+        self[bottom.into()][<u16 as Into<usize>>::into(right)] = Pixel {
             shape: [
                 BOX_DRAWINGS_LIGHT_UP_AND_LEFT,
-                BOX_DRAWINGS_LIGHT_UP_AND_LEFT,
+                ' ',
             ],
             color: Color::Default,
         };
