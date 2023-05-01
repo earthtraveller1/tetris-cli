@@ -78,7 +78,10 @@ impl Screen {
         unsafe {
             let mut terminal_settings = term::termios::default();
             term::tcgetattr(unistd::STDIN_FILENO as i32, &mut terminal_settings);
+
             terminal_settings.c_lflag &= !term::ICANON;
+            terminal_settings.c_lflag &= !term::ECHO;
+
             term::tcsetattr(
                 unistd::STDIN_FILENO as i32,
                 term::TCSANOW as i32,
