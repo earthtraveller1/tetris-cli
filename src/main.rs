@@ -7,7 +7,8 @@ use screen::Shape;
 use std::sync::mpsc::Receiver;
 use std::sync::mpsc::{channel, Sender};
 use std::thread;
-use std::thread::JoinHandle;
+use std::time::Duration;
+use std::time::Instant;
 
 // Unicode literals that might be useful in future.
 mod unicode {
@@ -122,7 +123,20 @@ fn main() {
     game.render();
 
     while game.is_running() {
+        let start = Instant::now();
+
         game.update();
         game.render();
+
+        let elapsed_time = start.elapsed();
+
+        // If the uncapped framerate is less than 60, then we simply
+        // leave it be. There's nothing we can do about that here.
+        if elapsed_time.as_millis() > 1000 / 30 {
+            continue;
+        }
+
+        let wait_duration = Duration::from_millis(1000 / 30) - elapsed_time;
+        thread::sleep(wait_duration);
     }
 }
