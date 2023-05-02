@@ -1,6 +1,13 @@
+// This file probably shouldn't be called "screen" since it contains a lot more than
+// just the screen abstraction. It also contains the rendering logic.
+
+use std::sync::mpsc::{channel, Sender};
+use std::sync::mpsc::{Receiver, TryRecvError};
+use std::thread;
+
 #[cfg(target_family = "unix")]
 use super::system::{termios as term, unistd};
-use std::ops::{Add, Index, IndexMut, Mul};
+use std::ops::{Index, IndexMut};
 
 // A basic representation of a "pixel"
 #[derive(Clone)]
@@ -8,20 +15,10 @@ pub struct Pixel {
     // The shape of the pixel, as in what is printed out when the pixel is displayed.
     // It is a two-element array because every "pixel" takes up two characters on the
     // terminal.
-    shape: [char; 2],
+    pub shape: [char; 2],
 
     // The color of the pixel
-    color: Color,
-}
-
-impl Pixel {
-    pub fn set_shape(&mut self, a: char, b: char) {
-        self.shape = [a, b];
-    }
-
-    pub fn set_color(&mut self, new_color: Color) {
-        self.color = new_color;
-    }
+    pub color: Color,
 }
 
 impl Default for Pixel {
@@ -38,29 +35,28 @@ impl Default for Pixel {
 pub enum Color {
     Default,
     Basic(u8), // Basic color support. Use for maximum compatibility. Only have 16 colors available.
-    RGB(u8, u8, u8),
 }
 
 pub mod colors {
     pub mod basic {
-        pub const BLACK: u8 = 30;
-        pub const RED: u8 = 31;
+        pub const _BLACK: u8 = 30;
+        pub const _RED: u8 = 31;
         pub const GREEN: u8 = 32;
-        pub const YELLOW: u8 = 33;
-        pub const BLUE: u8 = 34;
-        pub const MAGENTA: u8 = 35;
-        pub const CYAN: u8 = 36;
-        pub const WHITE: u8 = 37;
+        pub const _YELLOW: u8 = 33;
+        pub const _BLUE: u8 = 34;
+        pub const _MAGENTA: u8 = 35;
+        pub const _CYAN: u8 = 36;
+        pub const _WHITE: u8 = 37;
 
         // Bright colors.
-        pub const BRIGH_BLACK: u8 = 90;
-        pub const BRIGHT_RED: u8 = 91;
-        pub const BRIGHT_GREEN: u8 = 92;
-        pub const BRIGHT_YELLOW: u8 = 93;
-        pub const BRIGHT_BLUE: u8 = 94;
-        pub const BRIGHT_MAGENTA: u8 = 95;
-        pub const BRIGHT_CYAN: u8 = 96;
-        pub const BRIGHT_WHITE: u8 = 97;
+        pub const BRIGHT_BLACK: u8 = 90;
+        pub const _BRIGHT_RED: u8 = 91;
+        pub const _BRIGHT_GREEN: u8 = 92;
+        pub const _BRIGHT_YELLOW: u8 = 93;
+        pub const _BRIGHT_BLUE: u8 = 94;
+        pub const _BRIGHT_MAGENTA: u8 = 95;
+        pub const _BRIGHT_CYAN: u8 = 96;
+        pub const _BRIGHT_WHITE: u8 = 97;
     }
 }
 
@@ -70,9 +66,40 @@ pub struct Screen {
     width: u32,
     height: u32,
 
+    has_cursor_moved: bool,
+
+    event_reciever: Receiver<char>,
+
     // Used a single-dimensional vector instead of a vector of vectors to improve
     // performance.
     pixels: Vec<Pixel>,
+}
+//
+// Basically, read whatever key the user has pressed from the terminal
+// This is the UNIX version. The Windows version uses Microsoft's dedicated
+// function instead of getchar.
+#[cfg(target_family = "unix")]
+fn read_input() -> Option<char> {
+    unsafe { char::from_u32(crate::system::getchar().try_into().ok()?) }
+}
+
+// The Windows version of read input. Basically does the exact same
+// thing, but for windows.
+#[cfg(target_family = "windows")]
+fn read_input() -> Option<char> {
+    unsafe { char::from_u32(crate::system::conio::_getch().try_into().ok()?) }
+}
+
+// This is the thread that constantly listens for keyboard events and
+// broadcasts them as soon as it hears one.
+fn event_thread(sender: Sender<char>) {
+    loop {
+        if let Some(character) = read_input() {
+            if let Err(error) = sender.send(character) {
+                eprintln!("\x1B[91m[ERROR]: {:?}\x1B[91m", error);
+            }
+        }
+    }
 }
 
 impl Screen {
@@ -83,7 +110,10 @@ impl Screen {
         unsafe {
             let mut terminal_settings = term::termios::default();
             term::tcgetattr(unistd::STDIN_FILENO as i32, &mut terminal_settings);
+
             terminal_settings.c_lflag &= !term::ICANON;
+            terminal_settings.c_lflag &= !term::ECHO;
+
             term::tcsetattr(
                 unistd::STDIN_FILENO as i32,
                 term::TCSANOW as i32,
@@ -91,20 +121,34 @@ impl Screen {
             );
         }
 
+        let (sender, event_reciever) = channel();
+
+        // Make sure to start the event thread after creating the screen.
+        thread::spawn(move || event_thread(sender));
+
+        // And, yes, the thread runs until the program itself stops.
+        // That's probably not a good idea but it's the best we've got.
+
         Ok(Screen {
             width,
             height,
+            event_reciever,
+            has_cursor_moved: false,
             pixels: vec![Pixel::default(); (width * height).try_into()?],
         })
     }
-    
+
     // Returns the width of the screen. This can be used by clients to ensure
     // that they don't try to write to pixels that are out of bounds, which
     // can cause the program to panic.
-    pub fn width(&self) -> u32 { self.width }
-    
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
     // Returns the height of the screen. Same use case as the width() function
-    pub fn height(&self) -> u32 { self.height }
+    pub fn _height(&self) -> u32 {
+        self.height
+    }
 
     // Clears the entire screen. Basically, reset everyting back to spaces.
     pub fn clear(&mut self) {
@@ -130,50 +174,167 @@ impl Screen {
         );
     }
 
-    // Basically, read whatever key the user has pressed from the terminal
-    // This is the UNIX version. The Windows version uses Microsoft's dedicated
-    // function instead of getchar.
-    #[cfg(target_family = "unix")]
-    pub fn read_input() -> Option<char> {
-        unsafe { char::from_u32(crate::system::getchar().try_into().ok()?) }
-    }
-    
-    // The Windows version of read input. Basically does the exact same
-    // thing, but for windows.
-    #[cfg(target_family = "windows")]
-    pub fn read_input() -> Option<char> {
-        unsafe { char::from_u32(crate::system::conio::_getch().try_into().ok()?) }
+    // Takes the first event from the event channel and return it if it exists. If there
+    // is no event, it will return an Err variant.
+    pub fn read_input(&self) -> Result<char, TryRecvError> {
+        self.event_reciever.try_recv()
     }
 
     // Finally, the function that you've all been waiting for. This guy does all of the
     // hard work of going through the pixels and drawing them on the terminal.
-    pub fn present(&self) {
+    pub fn present(&mut self) {
+        if self.has_cursor_moved {
+            println!("\x1B[{}D\x1B[{}A", self.width, self.height + 1);
+        }
+
         // Move to the start of the screen before printing.
-        print!("\x1B[H");
+        // print!("\x1B[H");
 
         for i in 0..self.height {
             for j in 0..self.width {
                 let pixel: &Pixel = &self[i][j as usize];
 
-                // I'm sorry that this is way too hard to read but basically it's text
-                // colors that supports RGB. I don't have time to explain this but I can
-                // give you the link if you would like.
-                //
-                // https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit
-                if let Color::RGB(red, green, blue) = pixel.color {
-                    print!(
-                        "\x1B[38;2;{};{};{}m{}{}\x1B[0m",
-                        red, green, blue, pixel.shape[0], pixel.shape[1]
-                    )
-                } else if let Color::Basic(code) = pixel.color {
-                    print!("\x1B[{}m{}{}\x1B[0m", code, pixel.shape[0], pixel.shape[1]);
-                } else {
-                    print!("{}{}", pixel.shape[0], pixel.shape[1]);
+                match pixel.color {
+                    Color::Basic(code) => {
+                        print!("\x1B[{}m{}{}\x1B[0m", code, pixel.shape[0], pixel.shape[1])
+                    }
+                    Color::Default => print!("{}{}", pixel.shape[0], pixel.shape[1]),
                 }
             }
 
             println!("");
         }
+
+        self.has_cursor_moved = true;
+    }
+}
+
+// A struct for a shape.
+pub struct Shape {
+    // The squares that are taken up by the shape, relative to the
+    // shape itself.
+    pub pixels: Vec<(i16, i16)>,
+    // The pixel to fill the shape with.
+    pub fill_pixel: Pixel,
+}
+
+// TODO: Actually implement some methods to make this useful.
+#[derive(Debug)]
+pub struct OutOfBoundsError {}
+
+// Alright, so for the purpose of organization, I'm going to put
+// the high-level rendering logics into a different implementation
+// block.
+impl Screen {
+    // Draws a shape.
+    pub fn draw_shape(&mut self, shape: &Shape, x_pos: u16, y_pos: u16) {
+        let x_pos: i16 = x_pos.try_into().unwrap();
+        let y_pos: i16 = y_pos.try_into().unwrap();
+
+        shape.pixels.iter().for_each(|(pixel_x, pixel_y)| {
+            let real_x: i16 = x_pos + *pixel_x;
+            let real_y: i16 = y_pos + *pixel_y;
+
+            // Any pixels that are out of bounds are automatically clipped off.
+            // Also, the casting is safe as the || operators are short-circuited.
+            if (real_x < 0 || real_x as u32 >= self.width)
+                || (real_y < 0 || real_y as u32 >= self.height)
+            {
+                return;
+            }
+
+            // Both u32 and usize are larger than i16 and real_x and real_y are both
+            // guaranteed to be positive by this point, so this is safe (at least it
+            // should be).
+            self[real_x as u32][real_y as usize] = shape.fill_pixel.clone();
+        })
+    }
+
+    // Fills the screen with a specific color.
+    pub fn fill_with_pixel(&mut self, pixel: &Pixel) {
+        for i in 0..self.width {
+            for j in 0..self.height {
+                self[i][j as usize] = pixel.clone();
+            }
+        }
+    }
+
+    // Draws a box. Duh.
+    pub fn draw_box(&mut self, x_pos: u16, y_pos: u16, width: u16, height: u16) -> Result<(), OutOfBoundsError> {
+        let left = x_pos;
+        let right = x_pos + width;
+
+        let top = y_pos;
+        let bottom = y_pos + height;
+
+        if <u16 as Into<u32>>::into(right) >= self.width || <u16 as Into<u32>>::into(bottom) >= self.height {
+            return Err(OutOfBoundsError {});
+        }
+
+        // There are probably better ways to do this with iterators but I don't
+        // know them so please let me know if you do know them. :ye:
+
+        // Draw the horizontal lines
+        for i in left..right {
+            use crate::unicode::BOX_DRAWINGS_LIGHT_HORIZONTAL;
+
+            self[top.into()][<u16 as Into<usize>>::into(i)] = Pixel {
+                shape: [BOX_DRAWINGS_LIGHT_HORIZONTAL, BOX_DRAWINGS_LIGHT_HORIZONTAL],
+                color: Color::Default,
+            };
+
+            self[bottom.into()][<u16 as Into<usize>>::into(i)] = Pixel {
+                shape: [BOX_DRAWINGS_LIGHT_HORIZONTAL, BOX_DRAWINGS_LIGHT_HORIZONTAL],
+                color: Color::Default,
+            };
+        }
+
+        // Draw the vertical lines.
+        for i in left..right {
+            use crate::unicode::BOX_DRAWINGS_LIGHT_VERTICAL;
+
+            self[i.into()][<u16 as Into<usize>>::into(left)] = Pixel {
+                shape: [' ', BOX_DRAWINGS_LIGHT_VERTICAL],
+                color: Color::Default,
+            };
+
+            self[i.into()][<u16 as Into<usize>>::into(right)] = Pixel {
+                shape: [BOX_DRAWINGS_LIGHT_VERTICAL, ' '],
+                color: Color::Default,
+            };
+        }
+
+        use crate::unicode::{
+            BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT, BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT,
+            BOX_DRAWINGS_LIGHT_UP_AND_LEFT, BOX_DRAWINGS_LIGHT_UP_AND_RIGHT,
+        };
+
+        // Draw the corners.
+        // top left
+        self[top.into()][<u16 as Into<usize>>::into(left)] = Pixel {
+            shape: [' ', BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT],
+            color: Color::Default,
+        };
+
+        // top right
+        self[top.into()][<u16 as Into<usize>>::into(right)] = Pixel {
+            shape: [BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT, ' '],
+            color: Color::Default,
+        };
+
+        // bottom left
+        self[bottom.into()][<u16 as Into<usize>>::into(left)] = Pixel {
+            shape: [' ', BOX_DRAWINGS_LIGHT_UP_AND_RIGHT],
+            color: Color::Default,
+        };
+
+        // bottom right
+        self[bottom.into()][<u16 as Into<usize>>::into(right)] = Pixel {
+            shape: [BOX_DRAWINGS_LIGHT_UP_AND_LEFT, ' '],
+            color: Color::Default,
+        };
+        
+        Ok(())
     }
 }
 
