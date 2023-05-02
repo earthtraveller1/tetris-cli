@@ -41,7 +41,7 @@ pub mod colors {
     pub mod basic {
         pub const _BLACK: u8 = 30;
         pub const _RED: u8 = 31;
-        pub const _GREEN: u8 = 32;
+        pub const GREEN: u8 = 32;
         pub const _YELLOW: u8 = 33;
         pub const _BLUE: u8 = 34;
         pub const _MAGENTA: u8 = 35;
@@ -49,7 +49,7 @@ pub mod colors {
         pub const _WHITE: u8 = 37;
 
         // Bright colors.
-        pub const _BRIGHT_BLACK: u8 = 90;
+        pub const BRIGHT_BLACK: u8 = 90;
         pub const _BRIGHT_RED: u8 = 91;
         pub const _BRIGHT_GREEN: u8 = 92;
         pub const _BRIGHT_YELLOW: u8 = 93;

@@ -77,9 +77,9 @@ impl Game {
         self.screen.clear();
         self.screen.fill_with_pixel(&screen::Pixel {
             shape: [unicode::LIGHT_SHADE, ' '],
-            color: screen::Color::Basic(screen::colors::basic::BRIGH_BLACK),
+            color: screen::Color::Basic(screen::colors::basic::BRIGHT_BLACK),
         });
-        self.screen.draw_box(0, 0, 8, 8);
+        self.screen.draw_box(0, 0, 8, 8).unwrap();
         self.screen
             .draw_shape(&self.player_shape, self.player_x, self.player_y);
 
