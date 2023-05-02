@@ -1,6 +1,10 @@
 // This file probably shouldn't be called "screen" since it contains a lot more than
 // just the screen abstraction. It also contains the rendering logic.
 
+use std::sync::mpsc::{Receiver, TryRecvError};
+use std::sync::mpsc::{channel, Sender};
+use std::thread;
+
 #[cfg(target_family = "unix")]
 use super::system::{termios as term, unistd};
 use std::ops::{Index, IndexMut};
@@ -65,9 +69,38 @@ pub struct Screen {
 
     has_cursor_moved: bool,
 
+    event_reciever: Receiver<char>,
+
     // Used a single-dimensional vector instead of a vector of vectors to improve
     // performance.
     pixels: Vec<Pixel>,
+}
+//
+// Basically, read whatever key the user has pressed from the terminal
+// This is the UNIX version. The Windows version uses Microsoft's dedicated
+// function instead of getchar.
+#[cfg(target_family = "unix")]
+fn read_input() -> Option<char> {
+    unsafe { char::from_u32(crate::system::getchar().try_into().ok()?) }
+}
+
+// The Windows version of read input. Basically does the exact same
+// thing, but for windows.
+#[cfg(target_family = "windows")]
+fn read_input() -> Option<char> {
+    unsafe { char::from_u32(crate::system::conio::_getch().try_into().ok()?) }
+}
+
+// This is the thread that constantly listens for keyboard events and
+// broadcasts them as soon as it hears one.
+fn event_thread(sender: Sender<char>) {
+    loop {
+        if let Some(character) = read_input() {
+            if let Err(error) = sender.send(character) {
+                eprintln!("\x1B[91m[ERROR]: {:?}\x1B[91m", error);
+            }
+        }
+    }
 }
 
 impl Screen {
@@ -89,9 +122,18 @@ impl Screen {
             );
         }
 
+        let (sender, event_reciever) = channel();
+
+        // Make sure to start the event thread after creating the screen.
+        thread::spawn(move || event_thread(sender));
+
+        // And, yes, the thread runs until the program itself stops.
+        // That's probably not a good idea but it's the best we've got.
+
         Ok(Screen {
             width,
             height,
+            event_reciever,
             has_cursor_moved: false,
             pixels: vec![Pixel::default(); (width * height).try_into()?],
         })
@@ -133,19 +175,10 @@ impl Screen {
         );
     }
 
-    // Basically, read whatever key the user has pressed from the terminal
-    // This is the UNIX version. The Windows version uses Microsoft's dedicated
-    // function instead of getchar.
-    #[cfg(target_family = "unix")]
-    pub fn read_input() -> Option<char> {
-        unsafe { char::from_u32(crate::system::getchar().try_into().ok()?) }
-    }
-
-    // The Windows version of read input. Basically does the exact same
-    // thing, but for windows.
-    #[cfg(target_family = "windows")]
-    pub fn read_input() -> Option<char> {
-        unsafe { char::from_u32(crate::system::conio::_getch().try_into().ok()?) }
+    // Takes the first event from the event channel and return it if it exists. If there
+    // is no event, it will return an Err variant.
+    pub fn read_input(&self) -> Result<char, TryRecvError> {
+        self.event_reciever.try_recv()
     }
 
     // Finally, the function that you've all been waiting for. This guy does all of the
@@ -281,37 +314,25 @@ impl Screen {
         // Draw the corners.
         // top left
         self[top.into()][<u16 as Into<usize>>::into(left)] = Pixel {
-            shape: [
-                ' ',
-                BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT,
-            ],
+            shape: [' ', BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT],
             color: Color::Default,
         };
 
         // top right
         self[top.into()][<u16 as Into<usize>>::into(right)] = Pixel {
-            shape: [
-                BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT,
-                ' ',
-            ],
+            shape: [BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT, ' '],
             color: Color::Default,
         };
 
         // bottom left
         self[bottom.into()][<u16 as Into<usize>>::into(left)] = Pixel {
-            shape: [
-                ' ',
-                BOX_DRAWINGS_LIGHT_UP_AND_RIGHT,
-            ],
+            shape: [' ', BOX_DRAWINGS_LIGHT_UP_AND_RIGHT],
             color: Color::Default,
         };
 
         // bottom right
         self[bottom.into()][<u16 as Into<usize>>::into(right)] = Pixel {
-            shape: [
-                BOX_DRAWINGS_LIGHT_UP_AND_LEFT,
-                ' ',
-            ],
+            shape: [BOX_DRAWINGS_LIGHT_UP_AND_LEFT, ' '],
             color: Color::Default,
         };
     }

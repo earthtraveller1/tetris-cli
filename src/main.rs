@@ -33,35 +33,14 @@ struct Game {
 
     player_shape: Shape,
 
-    event_reciever: Receiver<char>,
-
     player_x: u16,
     player_y: u16,
-}
-
-// This is the thread that constantly listens for keyboard events and
-// broadcasts them as soon as it hears one.
-fn event_thread(sender: Sender<char>) {
-    loop {
-        if let Some(character) = Screen::read_input() {
-            if let Err(error) = sender.send(character) {
-                eprintln!("\x1B[91m[ERROR]: {:?}\x1B[91m", error);
-            }
-        }
-    }
 }
 
 impl Game {
     fn new() -> Game {
         let screen = Screen::new(16, 16).unwrap();
 
-        let (sender, event_reciever) = channel();
-
-        // Make sure to start the event thread after creating the screen.
-        thread::spawn(move || event_thread(sender));
-
-        // And, yes, the thread runs until the program itself stops.
-        // That's probably not a good idea but it's the best we've got.
 
         Game {
             screen,
@@ -72,7 +51,6 @@ impl Game {
                     color: screen::Color::Basic(screen::colors::basic::GREEN),
                 },
             },
-            event_reciever,
             running: true,
             player_x: 8,
             player_y: 8,
@@ -80,7 +58,7 @@ impl Game {
     }
 
     fn update(&mut self) {
-        if let Ok(input) = self.event_reciever.try_recv() {
+        if let Ok(input) = self.screen.read_input() {
             match input {
                 'w' => {
                     if self.player_y < (self.screen.width() - 1).try_into().unwrap() {
