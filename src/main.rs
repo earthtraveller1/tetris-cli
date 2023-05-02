@@ -5,8 +5,6 @@ mod tetris;
 use screen::Screen;
 use screen::Shape;
 
-use std::sync::mpsc::Receiver;
-use std::sync::mpsc::{channel, Sender};
 use std::thread;
 use std::time::Duration;
 use std::time::Instant;
