@@ -41,7 +41,7 @@ pub mod colors {
     pub mod basic {
         pub const _BLACK: u8 = 30;
         pub const _RED: u8 = 31;
-        pub const GREEN: u8 = 32;
+        pub const _GREEN: u8 = 32;
         pub const _YELLOW: u8 = 33;
         pub const _BLUE: u8 = 34;
         pub const _MAGENTA: u8 = 35;
@@ -49,7 +49,7 @@ pub mod colors {
         pub const _WHITE: u8 = 37;
 
         // Bright colors.
-        pub const BRIGH_BLACK: u8 = 90;
+        pub const _BRIGHT_BLACK: u8 = 90;
         pub const _BRIGHT_RED: u8 = 91;
         pub const _BRIGHT_GREEN: u8 = 92;
         pub const _BRIGHT_YELLOW: u8 = 93;
@@ -218,6 +218,10 @@ pub struct Shape {
     pub fill_pixel: Pixel,
 }
 
+// TODO: Actually implement some methods to make this useful.
+#[derive(Debug)]
+pub struct OutOfBoundsError {}
+
 // Alright, so for the purpose of organization, I'm going to put
 // the high-level rendering logics into a different implementation
 // block.
@@ -256,12 +260,16 @@ impl Screen {
     }
 
     // Draws a box. Duh.
-    pub fn draw_box(&mut self, x_pos: u16, y_pos: u16, width: u16, height: u16) {
+    pub fn draw_box(&mut self, x_pos: u16, y_pos: u16, width: u16, height: u16) -> Result<(), OutOfBoundsError> {
         let left = x_pos;
         let right = x_pos + width;
 
         let top = y_pos;
         let bottom = y_pos + height;
+
+        if <u16 as Into<u32>>::into(right) >= self.width || <u16 as Into<u32>>::into(bottom) >= self.height {
+            return Err(OutOfBoundsError {});
+        }
 
         // There are probably better ways to do this with iterators but I don't
         // know them so please let me know if you do know them. :ye:
@@ -325,6 +333,8 @@ impl Screen {
             shape: [BOX_DRAWINGS_LIGHT_UP_AND_LEFT, ' '],
             color: Color::Default,
         };
+        
+        Ok(())
     }
 }
 
