@@ -1,8 +1,8 @@
 // This file probably shouldn't be called "screen" since it contains a lot more than
 // just the screen abstraction. It also contains the rendering logic.
 
-use std::sync::mpsc::{Receiver, TryRecvError};
 use std::sync::mpsc::{channel, Sender};
+use std::sync::mpsc::{Receiver, TryRecvError};
 use std::thread;
 
 #[cfg(target_family = "unix")]
@@ -35,7 +35,6 @@ impl Default for Pixel {
 pub enum Color {
     Default,
     Basic(u8), // Basic color support. Use for maximum compatibility. Only have 16 colors available.
-    RGB(u8, u8, u8),
 }
 
 pub mod colors {
@@ -195,20 +194,11 @@ impl Screen {
             for j in 0..self.width {
                 let pixel: &Pixel = &self[i][j as usize];
 
-                // I'm sorry that this is way too hard to read but basically it's text
-                // colors that supports RGB. I don't have time to explain this but I can
-                // give you the link if you would like.
-                //
-                // https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit
-                if let Color::RGB(red, green, blue) = pixel.color {
-                    print!(
-                        "\x1B[38;2;{};{};{}m{}{}\x1B[0m",
-                        red, green, blue, pixel.shape[0], pixel.shape[1]
-                    )
-                } else if let Color::Basic(code) = pixel.color {
-                    print!("\x1B[{}m{}{}\x1B[0m", code, pixel.shape[0], pixel.shape[1]);
-                } else {
-                    print!("{}{}", pixel.shape[0], pixel.shape[1]);
+                match pixel.color {
+                    Color::Basic(code) => {
+                        print!("\x1B[{}m{}{}\x1B[0m", code, pixel.shape[0], pixel.shape[1])
+                    }
+                    Color::Default => print!("{}{}", pixel.shape[0], pixel.shape[1]),
                 }
             }
 
