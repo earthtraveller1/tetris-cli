@@ -1,5 +1,6 @@
 mod screen;
 mod system;
+mod tetris;
 
 use screen::Screen;
 use screen::Shape;
