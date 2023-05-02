@@ -39,7 +39,6 @@ impl Game {
     fn new() -> Game {
         let screen = Screen::new(16, 16).unwrap();
 
-
         Game {
             screen,
             player_shape: Shape {
