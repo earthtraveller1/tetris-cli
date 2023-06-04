@@ -28,7 +28,7 @@ impl Tetris {
     pub fn update(&mut self) {
         if let Ok(input) = self.screen.read_input() {
             match input {
-                'q' => self.is_running = true,
+                'q' => self.is_running = false,
                 _ => (),
             }
         }
