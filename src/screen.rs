@@ -260,14 +260,22 @@ impl Screen {
     }
 
     // Draws a box. Duh.
-    pub fn draw_box(&mut self, x_pos: u16, y_pos: u16, width: u16, height: u16) -> Result<(), OutOfBoundsError> {
+    pub fn draw_box(
+        &mut self,
+        x_pos: u16,
+        y_pos: u16,
+        width: u16,
+        height: u16,
+    ) -> Result<(), OutOfBoundsError> {
         let left = x_pos;
         let right = x_pos + width;
 
         let top = y_pos;
         let bottom = y_pos + height;
 
-        if <u16 as Into<u32>>::into(right) >= self.width || <u16 as Into<u32>>::into(bottom) >= self.height {
+        if <u16 as Into<u32>>::into(right) >= self.width
+            || <u16 as Into<u32>>::into(bottom) >= self.height
+        {
             return Err(OutOfBoundsError {});
         }
 
@@ -278,12 +286,12 @@ impl Screen {
         for i in left..right {
             use crate::unicode::BOX_DRAWINGS_LIGHT_HORIZONTAL;
 
-            self[top.into()][<u16 as Into<usize>>::into(i)] = Pixel {
+            self[i.into()][<u16 as Into<usize>>::into(top)] = Pixel {
                 shape: [BOX_DRAWINGS_LIGHT_HORIZONTAL, BOX_DRAWINGS_LIGHT_HORIZONTAL],
                 color: Color::Default,
             };
 
-            self[bottom.into()][<u16 as Into<usize>>::into(i)] = Pixel {
+            self[i.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
                 shape: [BOX_DRAWINGS_LIGHT_HORIZONTAL, BOX_DRAWINGS_LIGHT_HORIZONTAL],
                 color: Color::Default,
             };
@@ -293,12 +301,12 @@ impl Screen {
         for i in left..right {
             use crate::unicode::BOX_DRAWINGS_LIGHT_VERTICAL;
 
-            self[i.into()][<u16 as Into<usize>>::into(left)] = Pixel {
+            self[left.into()][<u16 as Into<usize>>::into(i)] = Pixel {
                 shape: [' ', BOX_DRAWINGS_LIGHT_VERTICAL],
                 color: Color::Default,
             };
 
-            self[i.into()][<u16 as Into<usize>>::into(right)] = Pixel {
+            self[right.into()][<u16 as Into<usize>>::into(i)] = Pixel {
                 shape: [BOX_DRAWINGS_LIGHT_VERTICAL, ' '],
                 color: Color::Default,
             };
@@ -311,29 +319,29 @@ impl Screen {
 
         // Draw the corners.
         // top left
-        self[top.into()][<u16 as Into<usize>>::into(left)] = Pixel {
+        self[left.into()][<u16 as Into<usize>>::into(top)] = Pixel {
             shape: [' ', BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT],
             color: Color::Default,
         };
 
         // top right
-        self[top.into()][<u16 as Into<usize>>::into(right)] = Pixel {
+        self[right.into()][<u16 as Into<usize>>::into(top)] = Pixel {
             shape: [BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT, ' '],
             color: Color::Default,
         };
 
         // bottom left
-        self[bottom.into()][<u16 as Into<usize>>::into(left)] = Pixel {
+        self[left.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
             shape: [' ', BOX_DRAWINGS_LIGHT_UP_AND_RIGHT],
             color: Color::Default,
         };
 
         // bottom right
-        self[bottom.into()][<u16 as Into<usize>>::into(right)] = Pixel {
+        self[right.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
             shape: [BOX_DRAWINGS_LIGHT_UP_AND_LEFT, ' '],
             color: Color::Default,
         };
-        
+
         Ok(())
     }
 }
