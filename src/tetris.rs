@@ -10,15 +10,19 @@ const SCREEN_HEIGHT: u32 = 20;
 
 pub struct Tetris {
     screen: Screen,
-    running: bool,
+    is_running: bool,
 }
 
 impl Tetris {
     pub fn new() -> Result<Tetris, TryFromIntError> {
         Ok(Tetris {
             screen: Screen::new(SCREEN_WIDTH, SCREEN_HEIGHT)?,
-            running: true,
+            is_running: true,
         })
+    }
+
+    pub fn is_running(&self) -> bool {
+        self.is_running
     }
 
     pub fn update(&mut self) {
