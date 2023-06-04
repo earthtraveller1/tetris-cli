@@ -42,7 +42,7 @@ pub mod colors {
         pub const _BLACK: u8 = 30;
         pub const _RED: u8 = 31;
         pub const GREEN: u8 = 32;
-        pub const _YELLOW: u8 = 33;
+        pub const YELLOW: u8 = 33;
         pub const _BLUE: u8 = 34;
         pub const _MAGENTA: u8 = 35;
         pub const _CYAN: u8 = 36;
