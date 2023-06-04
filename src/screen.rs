@@ -298,7 +298,7 @@ impl Screen {
         }
 
         // Draw the vertical lines.
-        for i in left..right {
+        for i in top..bottom {
             use crate::unicode::BOX_DRAWINGS_LIGHT_VERTICAL;
 
             self[left.into()][<u16 as Into<usize>>::into(i)] = Pixel {
