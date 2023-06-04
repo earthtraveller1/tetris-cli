@@ -48,10 +48,10 @@ mod shapes {
     };
 
     pub static RIGHT_SKEWED: Shape = Shape {
-        pixels: [(-1, -1), (0, 0), (0, -1), (1, 1)],
+        pixels: [(-1, -1), (0, 0), (0, -1), (1, 0)],
         fill_pixel: Pixel {
             shape: [FULL_BLOCK, FULL_BLOCK],
-            color: Color::Basic(GREEN),
+            color: Color::Basic(RED),
         },
     };
 }
@@ -103,7 +103,14 @@ impl Tetris {
             }
         };
 
-        self.screen.draw_shape(current_shape, 5, 5);
+        self.screen.draw_shape(current_shape, 2, 2);
+
+        // Draw all the shapes for testing.
+        self.screen.draw_shape(&shapes::TEE, 2, 7);
+        self.screen.draw_shape(&shapes::STRAIGHT, 2, 12);
+
+        self.screen.draw_shape(&shapes::LEFT_SKEWED, 6, 2);
+        self.screen.draw_shape(&shapes::RIGHT_SKEWED, 6, 7);
 
         self.screen.present();
 
