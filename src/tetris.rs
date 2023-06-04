@@ -16,7 +16,7 @@ pub struct Tetris {
 impl Tetris {
     pub fn new() -> Result<Tetris, TryFromIntError> {
         Ok(Tetris {
-            screen: Screen::new(SCREEN_WIDTH, SCREEN_HEIGHT)?,
+            screen: Screen::new(SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2)?,
             is_running: true,
         })
     }
@@ -42,7 +42,7 @@ impl Tetris {
         });
 
         self.screen
-            .draw_box(0, 0, (SCREEN_WIDTH - 1) as u16, (SCREEN_HEIGHT - 1) as u16)?;
+            .draw_box(0, 0, (SCREEN_WIDTH + 1) as u16, (SCREEN_HEIGHT + 1) as u16)?;
 
         self.screen.present();
 
