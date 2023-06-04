@@ -34,6 +34,7 @@ pub struct Tetris {
     is_running: bool,
 
     shapes: Shapes,
+    current_shape: Option<Shape>,
 }
 
 impl Tetris {
@@ -41,6 +42,7 @@ impl Tetris {
         Ok(Tetris {
             screen: Screen::new(SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2)?,
             is_running: true,
+            current_shape: None, // TODO: Select random shape
             shapes: Shapes::new(),
         })
     }
@@ -68,7 +70,15 @@ impl Tetris {
         self.screen
             .draw_box(0, 0, (SCREEN_WIDTH + 1) as u16, (SCREEN_HEIGHT + 1) as u16)?;
 
-        self.screen.draw_shape(&self.shapes.square, 5, 5);
+        let current_shape = match self.current_shape.as_ref() {
+            Some(shape) => shape,
+            None => {
+                self.current_shape = Some(self.shapes.square.clone()); // TODO: Random shape selection.
+                self.current_shape.as_ref().unwrap()
+            }
+        };
+
+        self.screen.draw_shape(current_shape, 5, 5);
 
         self.screen.present();
 
