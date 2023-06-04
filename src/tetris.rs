@@ -41,6 +41,9 @@ impl Tetris {
             color: screen::Color::Basic(screen::colors::basic::BRIGHT_BLACK),
         });
 
+        self.screen
+            .draw_box(0, 0, (SCREEN_WIDTH - 1) as u16, (SCREEN_HEIGHT - 1) as u16)?;
+
         self.screen.present();
 
         Ok(())
