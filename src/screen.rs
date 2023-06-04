@@ -192,7 +192,7 @@ impl Screen {
 
         for i in 0..self.height {
             for j in 0..self.width {
-                let pixel: &Pixel = &self[i][j as usize];
+                let pixel: &Pixel = &self[j][i as usize];
 
                 match pixel.color {
                     Color::Basic(code) => {
