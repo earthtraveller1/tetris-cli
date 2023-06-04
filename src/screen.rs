@@ -209,12 +209,15 @@ impl Screen {
     }
 }
 
+// In Tetris, all shapes are made up of only 4 pixels.
+const SHAPE_PIXEL_COUNT: usize = 4;
+
 // A struct for a shape.
 #[derive(Clone)]
 pub struct Shape {
     // The squares that are taken up by the shape, relative to the
     // shape itself.
-    pub pixels: Vec<(i16, i16)>,
+    pub pixels: [(i16, i16); SHAPE_PIXEL_COUNT],
     // The pixel to fill the shape with.
     pub fill_pixel: Pixel,
 }
