@@ -8,32 +8,26 @@ use crate::screen::{self, OutOfBoundsError, Pixel, Screen, Shape};
 const SCREEN_WIDTH: u32 = 10;
 const SCREEN_HEIGHT: u32 = 20;
 
-struct Shapes {
-    square: Shape,
-}
+mod shapes {
+    use crate::{
+        screen::{colors::basic::*, Color},
+        tetris::{Pixel, Shape},
+        unicode::FULL_BLOCK,
+    };
 
-impl Shapes {
-    fn new() -> Shapes {
-        use crate::screen::{colors::basic::*, Color};
-        use crate::unicode::FULL_BLOCK;
-
-        Shapes {
-            square: Shape {
-                pixels: vec![(0, 0), (1, 0), (1, 1), (0, 1)],
-                fill_pixel: Pixel {
-                    shape: [FULL_BLOCK, FULL_BLOCK],
-                    color: Color::Basic(YELLOW),
-                },
-            },
-        }
-    }
+    pub static SQUARE: Shape = Shape {
+        pixels: [(0, 0), (1, 0), (1, 1), (0, 1)],
+        fill_pixel: Pixel {
+            shape: [FULL_BLOCK, FULL_BLOCK],
+            color: Color::Basic(YELLOW),
+        },
+    };
 }
 
 pub struct Tetris {
     screen: Screen,
     is_running: bool,
 
-    shapes: Shapes,
     current_shape: Option<Shape>,
 }
 
@@ -43,7 +37,6 @@ impl Tetris {
             screen: Screen::new(SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2)?,
             is_running: true,
             current_shape: None, // TODO: Select random shape
-            shapes: Shapes::new(),
         })
     }
 
@@ -73,7 +66,7 @@ impl Tetris {
         let current_shape = match self.current_shape.as_ref() {
             Some(shape) => shape,
             None => {
-                self.current_shape = Some(self.shapes.square.clone()); // TODO: Random shape selection.
+                self.current_shape = Some(shapes::SQUARE.clone()); // TODO: Random shape selection.
                 self.current_shape.as_ref().unwrap()
             }
         };
