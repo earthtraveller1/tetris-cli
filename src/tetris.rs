@@ -22,6 +22,30 @@ mod shapes {
             color: Color::Basic(YELLOW),
         },
     };
+
+    pub static STRAIGHT: Shape = Shape {
+        pixels: [(0, -1), (0, 0), (0, 1), (0, 2)],
+        fill_pixel: Pixel {
+            shape: [FULL_BLOCK, FULL_BLOCK],
+            color: Color::Basic(CYAN),
+        },
+    };
+
+    pub static LEFT_SKEWED: Shape = Shape {
+        pixels: [(-1, 0), (0, 0), (0, -1), (1, -1)],
+        fill_pixel: Pixel {
+            shape: [FULL_BLOCK, FULL_BLOCK],
+            color: Color::Basic(GREEN),
+        },
+    };
+
+    pub static RIGHT_SKEWED: Shape = Shape {
+        pixels: [(-1, -1), (0, 0), (0, -1), (1, 1)],
+        fill_pixel: Pixel {
+            shape: [FULL_BLOCK, FULL_BLOCK],
+            color: Color::Basic(GREEN),
+        },
+    };
 }
 
 pub struct Tetris {
