@@ -39,24 +39,24 @@ pub enum Color {
 
 pub mod colors {
     pub mod basic {
-        pub const _BLACK: u8 = 30;
-        pub const _RED: u8 = 31;
+        pub const BLACK: u8 = 30;
+        pub const RED: u8 = 31;
         pub const GREEN: u8 = 32;
         pub const YELLOW: u8 = 33;
-        pub const _BLUE: u8 = 34;
-        pub const _MAGENTA: u8 = 35;
+        pub const BLUE: u8 = 34;
+        pub const MAGENTA: u8 = 35;
         pub const CYAN: u8 = 36;
-        pub const _WHITE: u8 = 37;
+        pub const WHITE: u8 = 37;
 
         // Bright colors.
         pub const BRIGHT_BLACK: u8 = 90;
-        pub const _BRIGHT_RED: u8 = 91;
-        pub const _BRIGHT_GREEN: u8 = 92;
-        pub const _BRIGHT_YELLOW: u8 = 93;
-        pub const _BRIGHT_BLUE: u8 = 94;
-        pub const _BRIGHT_MAGENTA: u8 = 95;
-        pub const _BRIGHT_CYAN: u8 = 96;
-        pub const _BRIGHT_WHITE: u8 = 97;
+        pub const BRIGHT_RED: u8 = 91;
+        pub const BRIGHT_GREEN: u8 = 92;
+        pub const BRIGHT_YELLOW: u8 = 93;
+        pub const BRIGHT_BLUE: u8 = 94;
+        pub const BRIGHT_MAGENTA: u8 = 95;
+        pub const BRIGHT_CYAN: u8 = 96;
+        pub const BRIGHT_WHITE: u8 = 97;
     }
 }
 
