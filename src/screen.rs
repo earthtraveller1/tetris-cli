@@ -210,6 +210,7 @@ impl Screen {
 }
 
 // A struct for a shape.
+#[derive(Clone)]
 pub struct Shape {
     // The squares that are taken up by the shape, relative to the
     // shape itself.
