@@ -45,7 +45,7 @@ pub mod colors {
         pub const YELLOW: u8 = 33;
         pub const _BLUE: u8 = 34;
         pub const _MAGENTA: u8 = 35;
-        pub const _CYAN: u8 = 36;
+        pub const CYAN: u8 = 36;
         pub const _WHITE: u8 = 37;
 
         // Bright colors.
