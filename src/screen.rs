@@ -146,7 +146,7 @@ impl Screen {
     }
 
     // Returns the height of the screen. Same use case as the width() function
-    pub fn _height(&self) -> u32 {
+    pub fn height(&self) -> u32 {
         self.height
     }
 
