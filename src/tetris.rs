@@ -84,14 +84,19 @@ static SHAPES: [&Shape; 7] = [
 
 // A Pseudorandom number generator, used to decide what piece to use next.
 struct RandomGenerator {
-    modulus: u16,
-    multiplier: u16,
-    increment: u16,
-    seed: u16,
+    modulus: u64,
+    multiplier: u64,
+    increment: u64,
+    seed: u64,
 }
 
 impl RandomGenerator {
-    fn new(modulus: u16, multiplier: u16, increment: u16, seed: u16) -> RandomGenerator {
+    fn new(modulus: u64, multiplier: u64, increment: u64) -> RandomGenerator {
+        use std::time::{SystemTime, UNIX_EPOCH};
+
+        let now = SystemTime::now();
+        let seed = now.duration_since(UNIX_EPOCH).unwrap().as_secs();
+
         RandomGenerator {
             modulus,
             multiplier,
@@ -100,7 +105,7 @@ impl RandomGenerator {
         }
     }
 
-    fn generate(&mut self) -> u16 {
+    fn generate(&mut self) -> u64 {
         let result = (self.multiplier * self.seed + self.increment) % self.modulus;
         self.seed = result;
         result
@@ -111,6 +116,8 @@ pub struct Tetris {
     screen: Screen,
     is_running: bool,
 
+    random_generator: RandomGenerator,
+
     current_shape: Option<Shape>,
 }
 
@@ -119,6 +126,7 @@ impl Tetris {
         Ok(Tetris {
             screen: Screen::new(SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2)?,
             is_running: true,
+            random_generator: RandomGenerator::new(7, 100, 1),
             current_shape: None, // TODO: Select random shape
         })
     }
@@ -150,22 +158,16 @@ impl Tetris {
         let current_shape = match self.current_shape.as_ref() {
             Some(shape) => shape,
             None => {
-                self.current_shape = Some(shapes::SQUARE.clone()); // TODO: Random shape selection.
+                self.current_shape = Some(
+                    SHAPES[<u64 as TryInto<usize>>::try_into(self.random_generator.generate())
+                        .unwrap()]
+                    .clone(),
+                );
                 self.current_shape.as_ref().unwrap()
             }
         };
 
         self.screen.draw_shape(current_shape, 2, 2);
-
-        // Draw all the shapes for testing.
-        self.screen.draw_shape(&shapes::TEE, 2, 7);
-        self.screen.draw_shape(&shapes::STRAIGHT, 2, 12);
-
-        self.screen.draw_shape(&shapes::LEFT_SKEWED, 2, 18);
-        self.screen.draw_shape(&shapes::RIGHT_SKEWED, 6, 3);
-
-        self.screen.draw_shape(&shapes::LEFT_L, 6, 8);
-        self.screen.draw_shape(&shapes::RIGHT_L, 6, 14);
 
         self.screen.present();
     }
