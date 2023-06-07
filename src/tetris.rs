@@ -3,7 +3,7 @@
 
 use std::num::TryFromIntError;
 
-use crate::screen::{self, OutOfBoundsError, Pixel, Screen, Shape};
+use crate::screen::{self, Pixel, Screen, Shape};
 
 const SCREEN_WIDTH: u32 = 10;
 const SCREEN_HEIGHT: u32 = 20;
