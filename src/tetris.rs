@@ -72,6 +72,31 @@ mod shapes {
     };
 }
 
+// A Pseudorandom number generator, used to decide what piece to use next.
+struct RandomGenerator {
+    modulus: u16,
+    multiplier: u16,
+    increment: u16,
+    seed: u16,
+}
+
+impl RandomGenerator {
+    fn new(modulus: u16, multiplier: u16, increment: u16, seed: u16) -> RandomGenerator {
+        RandomGenerator {
+            modulus,
+            multiplier,
+            increment,
+            seed,
+        }
+    }
+
+    fn generate(&mut self) -> u16 {
+        let result = (self.multiplier * self.seed + self.increment) % self.modulus;
+        self.seed = result;
+        result
+    }
+}
+
 pub struct Tetris {
     screen: Screen,
     is_running: bool,
