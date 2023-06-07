@@ -85,7 +85,7 @@ impl Tetris {
         }
     }
 
-    pub fn render(&mut self) -> Result<(), OutOfBoundsError> {
+    pub fn render(&mut self) {
         self.screen.clear();
         self.screen.fill_with_pixel(&Pixel {
             shape: [crate::unicode::LIGHT_SHADE, ' '],
@@ -93,7 +93,8 @@ impl Tetris {
         });
 
         self.screen
-            .draw_box(0, 0, (SCREEN_WIDTH + 1) as u16, (SCREEN_HEIGHT + 1) as u16)?;
+            .draw_box(0, 0, (SCREEN_WIDTH + 1) as u16, (SCREEN_HEIGHT + 1) as u16)
+            .unwrap();
 
         let current_shape = match self.current_shape.as_ref() {
             Some(shape) => shape,
@@ -113,7 +114,5 @@ impl Tetris {
         self.screen.draw_shape(&shapes::RIGHT_SKEWED, 6, 7);
 
         self.screen.present();
-
-        Ok(())
     }
 }
