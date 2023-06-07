@@ -32,10 +32,10 @@ mod shapes {
     };
 
     pub static TEE: Shape = Shape {
-        pixels: [(0, -1), (0, 0), (0, 1), (1, 0)],
+        pixels: [(0, -1), (0, 0), (-1, 0), (1, 0)],
         fill_pixel: Pixel {
             shape: [FULL_BLOCK, FULL_BLOCK],
-            color: Color::Basic(CYAN),
+            color: Color::Basic(MAGENTA),
         },
     };
 
