@@ -33,7 +33,7 @@ fn main() {
 
         let elapsed_time = start.elapsed();
 
-        // If the uncapped framerate is less than 60, then we simply
+        // If the uncapped framerate is less than 30, then we simply
         // leave it be. There's nothing we can do about that here.
         if elapsed_time.as_millis() > 1000 / 30 {
             continue;
