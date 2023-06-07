@@ -54,6 +54,22 @@ mod shapes {
             color: Color::Basic(RED),
         },
     };
+
+    pub static LEFT_L: Shape = Shape {
+        pixels: [(-1, 0), (0, 0), (0, -1), (0, -2)],
+        fill_pixel: Pixel {
+            shape: [FULL_BLOCK, FULL_BLOCK],
+            color: Color::Basic(BLUE),
+        },
+    };
+
+    pub static RIGHT_L: Shape = Shape {
+        pixels: [(1, 0), (0, 0), (0, -1), (0, -2)],
+        fill_pixel: Pixel {
+            shape: [FULL_BLOCK, FULL_BLOCK],
+            color: Color::Basic(BLUE),
+        },
+    };
 }
 
 pub struct Tetris {
@@ -110,8 +126,11 @@ impl Tetris {
         self.screen.draw_shape(&shapes::TEE, 2, 7);
         self.screen.draw_shape(&shapes::STRAIGHT, 2, 12);
 
-        self.screen.draw_shape(&shapes::LEFT_SKEWED, 6, 2);
-        self.screen.draw_shape(&shapes::RIGHT_SKEWED, 6, 7);
+        self.screen.draw_shape(&shapes::LEFT_SKEWED, 2, 18);
+        self.screen.draw_shape(&shapes::RIGHT_SKEWED, 6, 3);
+
+        self.screen.draw_shape(&shapes::LEFT_L, 6, 8);
+        self.screen.draw_shape(&shapes::RIGHT_L, 6, 14);
 
         self.screen.present();
     }
