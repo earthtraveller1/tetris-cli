@@ -72,6 +72,16 @@ mod shapes {
     };
 }
 
+static SHAPES: [&Shape; 7] = [
+    &shapes::SQUARE,
+    &shapes::STRAIGHT,
+    &shapes::TEE,
+    &shapes::LEFT_SKEWED,
+    &shapes::RIGHT_SKEWED,
+    &shapes::LEFT_L,
+    &shapes::RIGHT_L,
+];
+
 // A Pseudorandom number generator, used to decide what piece to use next.
 struct RandomGenerator {
     modulus: u16,
