@@ -126,7 +126,7 @@ impl Tetris {
         Ok(Tetris {
             screen: Screen::new(SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2)?,
             is_running: true,
-            random_generator: RandomGenerator::new(7, 100, 1),
+            random_generator: RandomGenerator::new(101, 4, 1),
             current_shape: None, // TODO: Select random shape
         })
     }
@@ -139,6 +139,9 @@ impl Tetris {
         if let Ok(input) = self.screen.read_input() {
             match input {
                 'q' => self.is_running = false,
+                'w' => {
+                    self.current_shape = None;
+                }
                 _ => (),
             }
         }
@@ -160,14 +163,15 @@ impl Tetris {
             None => {
                 self.current_shape = Some(
                     SHAPES[<u64 as TryInto<usize>>::try_into(self.random_generator.generate())
-                        .unwrap()]
+                        .unwrap()
+                        % 7]
                     .clone(),
                 );
                 self.current_shape.as_ref().unwrap()
             }
         };
 
-        self.screen.draw_shape(current_shape, 2, 2);
+        self.screen.draw_shape(current_shape, 5, 3);
 
         self.screen.present();
     }
