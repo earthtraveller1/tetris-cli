@@ -6,6 +6,8 @@ use std::thread;
 use std::time::Duration;
 use std::time::Instant;
 
+const FRAME_RATE: u8 = 30;
+
 // Unicode literals that might be useful in future.
 mod unicode {
     pub const FULL_BLOCK: char = '\u{2588}';
@@ -35,11 +37,11 @@ fn main() {
 
         // If the uncapped framerate is less than 30, then we simply
         // leave it be. There's nothing we can do about that here.
-        if elapsed_time.as_millis() > 1000 / 30 {
+        if elapsed_time.as_millis() > 1000 / FRAME_RATE as u128 {
             continue;
         }
 
-        let wait_duration = Duration::from_millis(1000 / 30) - elapsed_time;
+        let wait_duration = Duration::from_millis(1000 / FRAME_RATE as u64) - elapsed_time;
         thread::sleep(wait_duration);
     }
 }
