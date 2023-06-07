@@ -19,7 +19,7 @@ mod shapes {
         pixels: [(0, 0), (1, 0), (1, 1), (0, 1)],
         fill_pixel: Pixel {
             shape: [FULL_BLOCK, FULL_BLOCK],
-            color: Color::Basic(YELLOW),
+            color: Color::Basic(BRIGHT_YELLOW),
         },
     };
 
@@ -67,7 +67,7 @@ mod shapes {
         pixels: [(1, 0), (0, 0), (0, -1), (0, -2)],
         fill_pixel: Pixel {
             shape: [FULL_BLOCK, FULL_BLOCK],
-            color: Color::Basic(BLUE),
+            color: Color::Basic(YELLOW),
         },
     };
 }
