@@ -161,7 +161,7 @@ impl Tetris {
                     within_y_bounds = false;
                 }
 
-                if block_x >= SCREEN_WIDTH as i16 || block_x <= 0 {
+                if block_x > SCREEN_WIDTH as i16 || block_x <= 0 {
                     within_x_bounds = false;
                 }
             });
@@ -190,12 +190,20 @@ impl Tetris {
                 'q' => self.is_running = false,
                 'a' => {
                     if self.player_x > 0 {
-                        self.player_x -= 1
+                        self.player_x -= 1;
+                        let (within_bounds, _) = self.is_shape_in_bounds();
+
+                        if !within_bounds {
+                            self.player_x += 1;
+                        }
                     }
                 }
                 'd' => {
-                    if self.player_x < SCREEN_WIDTH as u16 {
-                        self.player_x += 1
+                    self.player_x += 1;
+                    let (within_bounds, _) = self.is_shape_in_bounds();
+
+                    if !within_bounds {
+                        self.player_x -= 1;
                     }
                 }
                 _ => (),
