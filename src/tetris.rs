@@ -151,6 +151,20 @@ impl Tetris {
             self.player_y += 1;
         }
 
+        // Check if the individual blocks are within bounds or not.
+        if let Some(current_shape) = self.current_shape.as_ref() {
+            current_shape.pixels.iter().for_each(|(_block_x, block_y)| {
+                let _block_x: i16 =
+                    _block_x + <u16 as TryInto<i16>>::try_into(self.player_x).unwrap();
+                let block_y: i16 =
+                    block_y + <u16 as TryInto<i16>>::try_into(self.player_y).unwrap();
+
+                if block_y > SCREEN_HEIGHT as i16 && self.fall_timer == 0 {
+                    self.player_y -= 1;
+                }
+            });
+        }
+
         self.fall_timer += 1;
 
         if let Ok(input) = self.screen.read_input() {
