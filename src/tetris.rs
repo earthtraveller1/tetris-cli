@@ -156,9 +156,8 @@ impl Tetris {
         if let Ok(input) = self.screen.read_input() {
             match input {
                 'q' => self.is_running = false,
-                'w' => {
-                    self.current_shape = None;
-                }
+                'a' => self.player_x -= 1,
+                'd' => self.player_x += 1,
                 _ => (),
             }
         }
