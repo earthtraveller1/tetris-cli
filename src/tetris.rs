@@ -118,6 +118,13 @@ pub struct Tetris {
 
     random_generator: RandomGenerator,
 
+    // This value is decremented every frame, and when it reaches the value of the framerate
+    // , it will be resetted back to zero and the playing piece will fall one unit down.
+    fall_timer: u16,
+
+    player_x: u16,
+    player_y: u16,
+
     current_shape: Option<Shape>,
 }
 
@@ -127,6 +134,9 @@ impl Tetris {
             screen: Screen::new(SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2)?,
             is_running: true,
             random_generator: RandomGenerator::new(101, 4, 1),
+            fall_timer: 0,
+            player_x: 5,
+            player_y: 3,
             current_shape: None, // TODO: Select random shape
         })
     }
@@ -136,6 +146,13 @@ impl Tetris {
     }
 
     pub fn update(&mut self) {
+        if self.fall_timer == crate::FRAME_RATE.into() {
+            self.fall_timer = 0;
+            self.player_y += 1;
+        }
+
+        self.fall_timer += 1;
+
         if let Ok(input) = self.screen.read_input() {
             match input {
                 'q' => self.is_running = false,
@@ -171,7 +188,8 @@ impl Tetris {
             }
         };
 
-        self.screen.draw_shape(current_shape, 5, 3);
+        self.screen
+            .draw_shape(current_shape, self.player_x, self.player_y);
 
         self.screen.present();
     }
