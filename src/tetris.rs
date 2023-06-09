@@ -145,24 +145,42 @@ impl Tetris {
         self.is_running
     }
 
-    pub fn update(&mut self) {
-        if self.fall_timer == crate::FRAME_RATE.into() {
-            self.fall_timer = 0;
-            self.player_y += 1;
-        }
-
-        // Check if the individual blocks are within bounds or not.
+    // Checks if the current shape is within the bounds of the game.
+    fn is_shape_in_bounds(&self) -> (bool, bool) {
         if let Some(current_shape) = self.current_shape.as_ref() {
-            current_shape.pixels.iter().for_each(|(_block_x, block_y)| {
-                let _block_x: i16 =
-                    _block_x + <u16 as TryInto<i16>>::try_into(self.player_x).unwrap();
+            let mut within_x_bounds = true;
+            let mut within_y_bounds = true;
+
+            current_shape.pixels.iter().for_each(|(block_x, block_y)| {
+                let block_x: i16 =
+                    block_x + <u16 as TryInto<i16>>::try_into(self.player_x).unwrap();
                 let block_y: i16 =
                     block_y + <u16 as TryInto<i16>>::try_into(self.player_y).unwrap();
 
-                if block_y > SCREEN_HEIGHT as i16 && self.fall_timer == 0 {
-                    self.player_y -= 1;
+                if block_y >= SCREEN_HEIGHT as i16 || block_y <= 0 {
+                    within_y_bounds = false;
+                }
+
+                if block_x >= SCREEN_WIDTH as i16 || block_x <= 0 {
+                    within_x_bounds = false;
                 }
             });
+
+            (within_x_bounds, within_y_bounds)
+        } else {
+            (false, false)
+        }
+    }
+
+    pub fn update(&mut self) {
+        if self.fall_timer == crate::FRAME_RATE.into() {
+            self.fall_timer = 0;
+
+            // Only fall if we are not at the bottom.
+            let (_, not_at_bottom) = self.is_shape_in_bounds();
+            if not_at_bottom {
+                self.player_y += 1;
+            }
         }
 
         self.fall_timer += 1;
@@ -170,8 +188,16 @@ impl Tetris {
         if let Ok(input) = self.screen.read_input() {
             match input {
                 'q' => self.is_running = false,
-                'a' => self.player_x -= 1,
-                'd' => self.player_x += 1,
+                'a' => {
+                    if self.player_x > 0 {
+                        self.player_x -= 1
+                    }
+                }
+                'd' => {
+                    if self.player_x < SCREEN_WIDTH as u16 {
+                        self.player_x += 1
+                    }
+                }
                 _ => (),
             }
         }
