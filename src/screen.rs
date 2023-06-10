@@ -222,6 +222,18 @@ pub struct Shape {
     pub fill_pixel: Pixel,
 }
 
+impl Shape {
+    pub fn rotate(&mut self) {
+        self.pixels.iter_mut().for_each(|coordinates| {
+            let (old_x, old_y) = *coordinates;
+            let (new_x, new_y) = coordinates;
+
+            *new_x = old_y;
+            *new_y = -old_x;
+        })
+    }
+}
+
 // TODO: Actually implement some methods to make this useful.
 #[derive(Debug)]
 pub struct OutOfBoundsError {}
