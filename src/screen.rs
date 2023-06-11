@@ -240,6 +240,28 @@ impl Shape {
             }
         })
     }
+
+    pub fn is_within_bounds(&self, x: u16, y: u16) -> (bool, bool) {
+        use crate::tetris::{SCREEN_HEIGHT, SCREEN_WIDTH};
+
+        let mut within_x_bounds = true;
+        let mut within_y_bounds = true;
+
+        self.pixels.iter().for_each(|(block_x, block_y)| {
+            let block_x: i16 = block_x + <u16 as TryInto<i16>>::try_into(x).unwrap();
+            let block_y: i16 = block_y + <u16 as TryInto<i16>>::try_into(y).unwrap();
+
+            if block_y >= SCREEN_HEIGHT as i16 || block_y <= 0 {
+                within_y_bounds = false;
+            }
+
+            if block_x > SCREEN_WIDTH as i16 || block_x <= 0 {
+                within_x_bounds = false;
+            }
+        });
+
+        (within_x_bounds, within_y_bounds)
+    }
 }
 
 // TODO: Actually implement some methods to make this useful.
