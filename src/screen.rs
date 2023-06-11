@@ -223,13 +223,21 @@ pub struct Shape {
 }
 
 impl Shape {
-    pub fn rotate(&mut self) {
+    pub fn rotate(&mut self, rotate_left: bool) {
         self.pixels.iter_mut().for_each(|coordinates| {
-            let (old_x, old_y) = *coordinates;
-            let (new_x, new_y) = coordinates;
+            if rotate_left {
+                let (old_x, old_y) = *coordinates;
+                let (new_x, new_y) = coordinates;
 
-            *new_x = old_y;
-            *new_y = -old_x;
+                *new_x = -old_y;
+                *new_y = old_x;
+            } else {
+                let (old_x, old_y) = *coordinates;
+                let (new_x, new_y) = coordinates;
+
+                *new_x = old_y;
+                *new_y = -old_x;
+            }
         })
     }
 }
