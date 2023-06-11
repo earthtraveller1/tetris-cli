@@ -5,8 +5,8 @@ use std::num::TryFromIntError;
 
 use crate::screen::{self, Pixel, Screen, Shape};
 
-const SCREEN_WIDTH: u32 = 10;
-const SCREEN_HEIGHT: u32 = 20;
+pub const SCREEN_WIDTH: u32 = 10;
+pub const SCREEN_HEIGHT: u32 = 20;
 
 mod shapes {
     use crate::{
@@ -209,11 +209,27 @@ impl Tetris {
                 's' => {
                     if let Some(current_shape) = self.current_shape.as_mut() {
                         current_shape.rotate(true);
+
+                        // This is to prevent rotating the shape out of bounds.
+                        let (within_x_bounds, within_y_bounds) =
+                            current_shape.is_within_bounds(self.player_x, self.player_y);
+                        if !within_x_bounds || !within_y_bounds {
+                            // Undo the rotation if it results in the shape going out of bounds.
+                            current_shape.rotate(false);
+                        }
                     }
                 }
                 'w' => {
                     if let Some(current_shape) = self.current_shape.as_mut() {
                         current_shape.rotate(false);
+
+                        // This is to prevent rotating the shape out of bounds.
+                        let (within_x_bounds, within_y_bounds) =
+                            current_shape.is_within_bounds(self.player_x, self.player_y);
+                        if !within_x_bounds || !within_y_bounds {
+                            // Undo the rotation if it results in the shape going out of bounds.
+                            current_shape.rotate(true);
+                        }
                     }
                 }
                 _ => (),
