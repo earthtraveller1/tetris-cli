@@ -206,9 +206,14 @@ impl Tetris {
                         self.player_x -= 1;
                     }
                 }
-                'r' => {
+                's' => {
                     if let Some(current_shape) = self.current_shape.as_mut() {
-                        current_shape.rotate();
+                        current_shape.rotate(true);
+                    }
+                }
+                'w' => {
+                    if let Some(current_shape) = self.current_shape.as_mut() {
+                        current_shape.rotate(false);
                     }
                 }
                 _ => (),
