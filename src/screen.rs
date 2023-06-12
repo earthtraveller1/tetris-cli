@@ -39,24 +39,24 @@ pub enum Color {
 
 pub mod colors {
     pub mod basic {
-        pub const _BLACK: u8 = 30;
-        pub const _RED: u8 = 31;
+        pub const BLACK: u8 = 30;
+        pub const RED: u8 = 31;
         pub const GREEN: u8 = 32;
-        pub const _YELLOW: u8 = 33;
-        pub const _BLUE: u8 = 34;
-        pub const _MAGENTA: u8 = 35;
-        pub const _CYAN: u8 = 36;
-        pub const _WHITE: u8 = 37;
+        pub const YELLOW: u8 = 33;
+        pub const BLUE: u8 = 34;
+        pub const MAGENTA: u8 = 35;
+        pub const CYAN: u8 = 36;
+        pub const WHITE: u8 = 37;
 
         // Bright colors.
         pub const BRIGHT_BLACK: u8 = 90;
-        pub const _BRIGHT_RED: u8 = 91;
-        pub const _BRIGHT_GREEN: u8 = 92;
-        pub const _BRIGHT_YELLOW: u8 = 93;
-        pub const _BRIGHT_BLUE: u8 = 94;
-        pub const _BRIGHT_MAGENTA: u8 = 95;
-        pub const _BRIGHT_CYAN: u8 = 96;
-        pub const _BRIGHT_WHITE: u8 = 97;
+        pub const BRIGHT_RED: u8 = 91;
+        pub const BRIGHT_GREEN: u8 = 92;
+        pub const BRIGHT_YELLOW: u8 = 93;
+        pub const BRIGHT_BLUE: u8 = 94;
+        pub const BRIGHT_MAGENTA: u8 = 95;
+        pub const BRIGHT_CYAN: u8 = 96;
+        pub const BRIGHT_WHITE: u8 = 97;
     }
 }
 
@@ -146,7 +146,7 @@ impl Screen {
     }
 
     // Returns the height of the screen. Same use case as the width() function
-    pub fn _height(&self) -> u32 {
+    pub fn height(&self) -> u32 {
         self.height
     }
 
@@ -192,7 +192,7 @@ impl Screen {
 
         for i in 0..self.height {
             for j in 0..self.width {
-                let pixel: &Pixel = &self[i][j as usize];
+                let pixel: &Pixel = &self[j][i as usize];
 
                 match pixel.color {
                     Color::Basic(code) => {
@@ -209,13 +209,59 @@ impl Screen {
     }
 }
 
+// In Tetris, all shapes are made up of only 4 pixels.
+const SHAPE_PIXEL_COUNT: usize = 4;
+
 // A struct for a shape.
+#[derive(Clone)]
 pub struct Shape {
     // The squares that are taken up by the shape, relative to the
     // shape itself.
-    pub pixels: Vec<(i16, i16)>,
+    pub pixels: [(i16, i16); SHAPE_PIXEL_COUNT],
     // The pixel to fill the shape with.
     pub fill_pixel: Pixel,
+}
+
+impl Shape {
+    pub fn rotate(&mut self, rotate_left: bool) {
+        self.pixels.iter_mut().for_each(|coordinates| {
+            if rotate_left {
+                let (old_x, old_y) = *coordinates;
+                let (new_x, new_y) = coordinates;
+
+                *new_x = -old_y;
+                *new_y = old_x;
+            } else {
+                let (old_x, old_y) = *coordinates;
+                let (new_x, new_y) = coordinates;
+
+                *new_x = old_y;
+                *new_y = -old_x;
+            }
+        })
+    }
+
+    pub fn is_within_bounds(&self, x: u16, y: u16) -> (bool, bool) {
+        use crate::tetris::{SCREEN_HEIGHT, SCREEN_WIDTH};
+
+        let mut within_x_bounds = true;
+        let mut within_y_bounds = true;
+
+        self.pixels.iter().for_each(|(block_x, block_y)| {
+            let block_x: i16 = block_x + <u16 as TryInto<i16>>::try_into(x).unwrap();
+            let block_y: i16 = block_y + <u16 as TryInto<i16>>::try_into(y).unwrap();
+
+            if block_y >= SCREEN_HEIGHT as i16 || block_y <= 0 {
+                within_y_bounds = false;
+            }
+
+            if block_x > SCREEN_WIDTH as i16 || block_x <= 0 {
+                within_x_bounds = false;
+            }
+        });
+
+        (within_x_bounds, within_y_bounds)
+    }
 }
 
 // TODO: Actually implement some methods to make this useful.
@@ -260,14 +306,22 @@ impl Screen {
     }
 
     // Draws a box. Duh.
-    pub fn draw_box(&mut self, x_pos: u16, y_pos: u16, width: u16, height: u16) -> Result<(), OutOfBoundsError> {
+    pub fn draw_box(
+        &mut self,
+        x_pos: u16,
+        y_pos: u16,
+        width: u16,
+        height: u16,
+    ) -> Result<(), OutOfBoundsError> {
         let left = x_pos;
         let right = x_pos + width;
 
         let top = y_pos;
         let bottom = y_pos + height;
 
-        if <u16 as Into<u32>>::into(right) >= self.width || <u16 as Into<u32>>::into(bottom) >= self.height {
+        if <u16 as Into<u32>>::into(right) >= self.width
+            || <u16 as Into<u32>>::into(bottom) >= self.height
+        {
             return Err(OutOfBoundsError {});
         }
 
@@ -278,27 +332,27 @@ impl Screen {
         for i in left..right {
             use crate::unicode::BOX_DRAWINGS_LIGHT_HORIZONTAL;
 
-            self[top.into()][<u16 as Into<usize>>::into(i)] = Pixel {
+            self[i.into()][<u16 as Into<usize>>::into(top)] = Pixel {
                 shape: [BOX_DRAWINGS_LIGHT_HORIZONTAL, BOX_DRAWINGS_LIGHT_HORIZONTAL],
                 color: Color::Default,
             };
 
-            self[bottom.into()][<u16 as Into<usize>>::into(i)] = Pixel {
+            self[i.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
                 shape: [BOX_DRAWINGS_LIGHT_HORIZONTAL, BOX_DRAWINGS_LIGHT_HORIZONTAL],
                 color: Color::Default,
             };
         }
 
         // Draw the vertical lines.
-        for i in left..right {
+        for i in top..bottom {
             use crate::unicode::BOX_DRAWINGS_LIGHT_VERTICAL;
 
-            self[i.into()][<u16 as Into<usize>>::into(left)] = Pixel {
+            self[left.into()][<u16 as Into<usize>>::into(i)] = Pixel {
                 shape: [' ', BOX_DRAWINGS_LIGHT_VERTICAL],
                 color: Color::Default,
             };
 
-            self[i.into()][<u16 as Into<usize>>::into(right)] = Pixel {
+            self[right.into()][<u16 as Into<usize>>::into(i)] = Pixel {
                 shape: [BOX_DRAWINGS_LIGHT_VERTICAL, ' '],
                 color: Color::Default,
             };
@@ -311,29 +365,29 @@ impl Screen {
 
         // Draw the corners.
         // top left
-        self[top.into()][<u16 as Into<usize>>::into(left)] = Pixel {
+        self[left.into()][<u16 as Into<usize>>::into(top)] = Pixel {
             shape: [' ', BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT],
             color: Color::Default,
         };
 
         // top right
-        self[top.into()][<u16 as Into<usize>>::into(right)] = Pixel {
+        self[right.into()][<u16 as Into<usize>>::into(top)] = Pixel {
             shape: [BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT, ' '],
             color: Color::Default,
         };
 
         // bottom left
-        self[bottom.into()][<u16 as Into<usize>>::into(left)] = Pixel {
+        self[left.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
             shape: [' ', BOX_DRAWINGS_LIGHT_UP_AND_RIGHT],
             color: Color::Default,
         };
 
         // bottom right
-        self[bottom.into()][<u16 as Into<usize>>::into(right)] = Pixel {
+        self[right.into()][<u16 as Into<usize>>::into(bottom)] = Pixel {
             shape: [BOX_DRAWINGS_LIGHT_UP_AND_LEFT, ' '],
             color: Color::Default,
         };
-        
+
         Ok(())
     }
 }
