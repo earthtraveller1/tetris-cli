@@ -204,7 +204,7 @@ impl Tetris {
     }
 
     pub fn update(&mut self) {
-        if self.fall_timer == crate::FRAME_RATE.into() {
+        if self.fall_timer == <u8 as Into<u16>>::into(crate::FRAME_RATE) / 2 {
             self.fall_timer = 0;
 
             // Only fall if we are not at the bottom.
