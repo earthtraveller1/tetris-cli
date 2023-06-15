@@ -80,7 +80,19 @@ pub struct Screen {
 // function instead of getchar.
 #[cfg(target_family = "unix")]
 fn read_input() -> Option<char> {
-    unsafe { char::from_u32(crate::system::getchar().try_into().ok()?) }
+    use std::io::Read;
+
+    let mut character = 0;
+    match std::io::stdin().read(std::slice::from_mut(&mut character)) {
+        Ok(bytes_read) => {
+            if bytes_read != 0 {
+                std::char::from_u32(character.into())
+            } else {
+                None
+            }
+        }
+        Err(_) => None,
+    }
 }
 
 // The Windows version of read input. Basically does the exact same
