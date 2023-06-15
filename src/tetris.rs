@@ -203,6 +203,20 @@ impl Tetris {
         }
     }
 
+    fn fall_until_hit(&mut self) {
+        loop {
+            let (_, not_at_bottom) = self.is_shape_in_bounds();
+            if not_at_bottom {
+                self.player_y += 1;
+            } else {
+                self.player_y -= 1;
+                self.fossilize_current_piece();
+
+                break;
+            }
+        }
+    }
+
     pub fn update(&mut self) {
         if self.fall_timer == <u8 as Into<u16>>::into(crate::FRAME_RATE) / 2 {
             self.fall_timer = 0;
@@ -266,6 +280,7 @@ impl Tetris {
                         }
                     }
                 }
+                ' ' => self.fall_until_hit(),
                 _ => (),
             }
         }
