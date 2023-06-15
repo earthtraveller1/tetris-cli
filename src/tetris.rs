@@ -305,7 +305,7 @@ impl Tetris {
                     use crate::screen::Color;
                     use crate::unicode::FULL_BLOCK;
 
-                    self.screen[j][i] = Pixel {
+                    self.screen[j + 1][i + 1] = Pixel {
                         shape: [FULL_BLOCK, FULL_BLOCK],
                         color: Color::Basic(color),
                     };
