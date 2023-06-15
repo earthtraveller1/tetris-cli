@@ -299,8 +299,7 @@ impl Tetris {
                     use crate::screen::Color;
                     use crate::unicode::FULL_BLOCK;
 
-                    self.screen[i.try_into().unwrap()]
-                        [<u32 as TryInto<usize>>::try_into(j).unwrap()] = Pixel {
+                    self.screen[j][i] = Pixel {
                         shape: [FULL_BLOCK, FULL_BLOCK],
                         color: Color::Basic(color),
                     };
