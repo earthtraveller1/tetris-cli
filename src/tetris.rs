@@ -280,6 +280,20 @@ impl Tetris {
                         }
                     }
                 }
+                'z' => {
+                    if let Some(current_shape) = self.current_shape.as_mut() {
+                        current_shape.flip(true);
+                    }
+
+                    // Checks are not needed here, as it is impossible to flip out of bounds.
+                }
+                'x' => {
+                    if let Some(current_shape) = self.current_shape.as_mut() {
+                        current_shape.flip(false);
+                    }
+
+                    // Checks are not needed here, as it is impossible to flip out of bounds.
+                }
                 ' ' => self.fall_until_hit(),
                 _ => (),
             }

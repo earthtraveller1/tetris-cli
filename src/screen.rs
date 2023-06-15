@@ -253,6 +253,19 @@ impl Shape {
         })
     }
 
+    pub fn flip(&mut self, horizontally: bool) {
+        self.pixels.iter_mut().for_each(|coordinates| {
+            let (old_x, old_y) = *coordinates;
+            let (new_x, new_y) = coordinates;
+
+            if horizontally {
+                *new_x = -old_x;
+            } else {
+                *new_y = -old_y;
+            }
+        })
+    }
+
     pub fn is_within_bounds(&self, x: u16, y: u16) -> (bool, bool) {
         use crate::tetris::{SCREEN_HEIGHT, SCREEN_WIDTH};
 
