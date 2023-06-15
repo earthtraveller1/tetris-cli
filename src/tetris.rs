@@ -135,11 +135,16 @@ impl Tetris {
         Ok(Tetris {
             screen: Screen::new(SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2)?,
             is_running: true,
+
             random_generator: RandomGenerator::new(101, 4, 1),
+
             fall_timer: 0,
+
             player_x: 5,
             player_y: 3,
+
             blocks: vec![[None; SCREEN_WIDTH as usize]; SCREEN_HEIGHT as usize],
+
             current_shape: None, // TODO: Select random shape
         })
     }
