@@ -180,6 +180,26 @@ impl Tetris {
         }
     }
 
+    fn fossilize_current_piece(&mut self) {
+        if let Some(shape) = self.current_shape.as_ref() {
+            shape.pixels.iter().for_each(|(component_x, component_y)| {
+                self.blocks[<i16 as TryInto<usize>>::try_into(
+                    *component_y + <u16 as TryInto<i16>>::try_into(self.player_y).unwrap(),
+                )
+                .unwrap()][<i16 as TryInto<usize>>::try_into(
+                    *component_x + <u16 as TryInto<i16>>::try_into(self.player_x - 1).unwrap(),
+                )
+                .unwrap()] = if let crate::screen::Color::Basic(color) = shape.fill_pixel.color {
+                    Some(color)
+                } else {
+                    None
+                };
+            });
+
+            self.current_shape = None;
+        }
+    }
+
     pub fn update(&mut self) {
         if self.fall_timer == crate::FRAME_RATE.into() {
             self.fall_timer = 0;
@@ -188,6 +208,9 @@ impl Tetris {
             let (_, not_at_bottom) = self.is_shape_in_bounds();
             if not_at_bottom {
                 self.player_y += 1;
+            } else {
+                self.player_y -= 1;
+                self.fossilize_current_piece();
             }
         }
 
