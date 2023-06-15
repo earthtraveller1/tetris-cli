@@ -8,6 +8,9 @@ use crate::screen::{self, Pixel, Screen, Shape};
 pub const SCREEN_WIDTH: u32 = 10;
 pub const SCREEN_HEIGHT: u32 = 20;
 
+pub const PLAYER_STARTING_X: u16 = 5;
+pub const PLAYER_STARTING_Y: u16 = 3;
+
 mod shapes {
     use crate::{
         screen::{colors::basic::*, Color},
@@ -140,8 +143,8 @@ impl Tetris {
 
             fall_timer: 0,
 
-            player_x: 5,
-            player_y: 3,
+            player_x: PLAYER_STARTING_X,
+            player_y: PLAYER_STARTING_Y,
 
             blocks: vec![[None; SCREEN_WIDTH as usize]; SCREEN_HEIGHT as usize],
 
@@ -282,6 +285,9 @@ impl Tetris {
         let current_shape = match self.current_shape.as_ref() {
             Some(shape) => shape,
             None => {
+                self.player_x = PLAYER_STARTING_X;
+                self.player_y = PLAYER_STARTING_Y;
+
                 self.current_shape = Some(
                     SHAPES[<u64 as TryInto<usize>>::try_into(self.random_generator.generate())
                         .unwrap()
