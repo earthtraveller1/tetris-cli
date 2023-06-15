@@ -125,6 +125,8 @@ pub struct Tetris {
     player_x: u16,
     player_y: u16,
 
+    blocks: Vec<[Option<u8>; SCREEN_WIDTH as usize]>,
+
     current_shape: Option<Shape>,
 }
 
@@ -137,6 +139,7 @@ impl Tetris {
             fall_timer: 0,
             player_x: 5,
             player_y: 3,
+            blocks: vec![[None; SCREEN_WIDTH as usize]; SCREEN_HEIGHT as usize],
             current_shape: None, // TODO: Select random shape
         })
     }
@@ -260,6 +263,22 @@ impl Tetris {
                 self.current_shape.as_ref().unwrap()
             }
         };
+
+        // Render the blocks onto the screen
+        self.blocks.iter().enumerate().for_each(|(i, row)| {
+            for j in 0..SCREEN_WIDTH {
+                if let Some(color) = row[<u32 as TryInto<usize>>::try_into(j).unwrap()] {
+                    use crate::screen::Color;
+                    use crate::unicode::FULL_BLOCK;
+
+                    self.screen[i.try_into().unwrap()]
+                        [<u32 as TryInto<usize>>::try_into(j).unwrap()] = Pixel {
+                        shape: [FULL_BLOCK, FULL_BLOCK],
+                        color: Color::Basic(color),
+                    };
+                }
+            }
+        });
 
         self.screen
             .draw_shape(current_shape, self.player_x, self.player_y);
