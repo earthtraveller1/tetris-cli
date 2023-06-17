@@ -431,6 +431,36 @@ impl Screen {
 
         Ok(())
     }
+
+    pub fn draw_text(&mut self, x: u32, y: u32, text: &str) {
+        if x >= self.width || y >= self.height {
+            return;
+        }
+
+        text.chars()
+            .collect::<Vec<char>>()
+            .chunks(2)
+            .enumerate()
+            .for_each(|(index, characters)| {
+                let pixel_x = x + index as u32;
+                let pixel_y: usize = y.try_into().unwrap();
+
+                let second_char = if let Some(second_char) = characters.get(1) {
+                    *second_char
+                } else {
+                    ' '
+                };
+
+                if pixel_x < self.width {
+                    let pixel = Pixel {
+                        shape: [characters[0], second_char],
+                        color: Color::Default,
+                    };
+
+                    self[pixel_x][pixel_y] = pixel;
+                }
+            });
+    }
 }
 
 impl Index<u32> for Screen {
