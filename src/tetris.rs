@@ -131,6 +131,8 @@ pub struct Tetris {
     player_x: u16,
     player_y: u16,
 
+    score: u32,
+
     blocks: Vec<[Option<u8>; GAME_WIDTH as usize]>,
 
     current_shape: Option<Shape>,
@@ -148,6 +150,8 @@ impl Tetris {
 
             player_x: PLAYER_STARTING_X,
             player_y: PLAYER_STARTING_Y,
+
+            score: 0,
 
             blocks: vec![[None; GAME_WIDTH as usize]; GAME_HEIGHT as usize],
 
@@ -215,6 +219,8 @@ impl Tetris {
 
             self.current_shape = None;
 
+            let mut rows_cleared = 0;
+
             // Now, iterate through the rows and clear the ones that are full.
             let mut i = 0;
             while i < self.blocks.len() {
@@ -226,11 +232,14 @@ impl Tetris {
                 if let None = is_row_not_full {
                     self.blocks.remove(i);
                     self.blocks.insert(0, [None; 10]);
+                    rows_cleared += 1;
                     continue;
                 }
 
                 i += 1;
             }
+
+            self.score += rows_cleared * 100;
         }
     }
 
@@ -347,6 +356,9 @@ impl Tetris {
         self.screen
             .draw_box(0, 0, (GAME_WIDTH + 1) as u16, (GAME_HEIGHT + 1) as u16)
             .unwrap();
+
+        self.screen.draw_text(12, 1, "SCORE");
+        self.screen.draw_text(12, 2, &format!("{}", self.score));
 
         let current_shape = match self.current_shape.as_ref() {
             Some(shape) => shape,
