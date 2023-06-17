@@ -214,6 +214,23 @@ impl Tetris {
             });
 
             self.current_shape = None;
+
+            // Now, iterate through the rows and clear the ones that are full.
+            let mut i = 0;
+            while i < self.blocks.len() {
+                let is_row_not_full =
+                    self.blocks[i]
+                        .iter()
+                        .find(|block| if let None = block { true } else { false });
+
+                if let None = is_row_not_full {
+                    self.blocks.remove(i);
+                    self.blocks.insert(0, [None; 10]);
+                    continue;
+                }
+
+                i += 1;
+            }
         }
     }
 
