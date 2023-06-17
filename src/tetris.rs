@@ -360,6 +360,15 @@ impl Tetris {
                         % 7]
                     .clone(),
                 );
+
+                // If the current shape is out of bounds as soon as it's spawned, then it's likely
+                // because the player has lost.
+                let (within_x_bounds, within_y_bounds) = self.is_shape_in_bounds();
+                if !within_x_bounds || !within_y_bounds {
+                    self.is_running = false;
+                    return;
+                }
+
                 self.current_shape.as_ref().unwrap()
             }
         };
