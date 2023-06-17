@@ -39,24 +39,24 @@ pub enum Color {
 
 pub mod colors {
     pub mod basic {
-        pub const BLACK: u8 = 30;
+        pub const _BLACK: u8 = 30;
         pub const RED: u8 = 31;
         pub const GREEN: u8 = 32;
         pub const YELLOW: u8 = 33;
         pub const BLUE: u8 = 34;
         pub const MAGENTA: u8 = 35;
         pub const CYAN: u8 = 36;
-        pub const WHITE: u8 = 37;
+        pub const _WHITE: u8 = 37;
 
         // Bright colors.
         pub const BRIGHT_BLACK: u8 = 90;
-        pub const BRIGHT_RED: u8 = 91;
-        pub const BRIGHT_GREEN: u8 = 92;
+        pub const _BRIGHT_RED: u8 = 91;
+        pub const _BRIGHT_GREEN: u8 = 92;
         pub const BRIGHT_YELLOW: u8 = 93;
-        pub const BRIGHT_BLUE: u8 = 94;
-        pub const BRIGHT_MAGENTA: u8 = 95;
-        pub const BRIGHT_CYAN: u8 = 96;
-        pub const BRIGHT_WHITE: u8 = 97;
+        pub const _BRIGHT_BLUE: u8 = 94;
+        pub const _BRIGHT_MAGENTA: u8 = 95;
+        pub const _BRIGHT_CYAN: u8 = 96;
+        pub const _BRIGHT_WHITE: u8 = 97;
     }
 }
 
@@ -153,12 +153,12 @@ impl Screen {
     // Returns the width of the screen. This can be used by clients to ensure
     // that they don't try to write to pixels that are out of bounds, which
     // can cause the program to panic.
-    pub fn width(&self) -> u32 {
+    pub fn _width(&self) -> u32 {
         self.width
     }
 
     // Returns the height of the screen. Same use case as the width() function
-    pub fn height(&self) -> u32 {
+    pub fn _height(&self) -> u32 {
         self.height
     }
 
@@ -322,7 +322,7 @@ impl Screen {
     }
 
     // Fills the screen with a specific color.
-    pub fn fill_with_pixel(&mut self, pixel: &Pixel) {
+    pub fn _fill_with_pixel(&mut self, pixel: &Pixel) {
         for i in 0..self.width {
             for j in 0..self.height {
                 self[i][j as usize] = pixel.clone();
