@@ -330,22 +330,6 @@ impl Screen {
         }
     }
 
-    // Fills an area of the screen with a specific color.
-    pub fn fill_area_with_pixel(
-        &mut self,
-        pixel: &Pixel,
-        start_x: u16,
-        start_y: u16,
-        end_x: u16,
-        end_y: u16,
-    ) {
-        for i in start_x..end_x {
-            for j in start_y..end_y {
-                self[i.into()][j as usize] = pixel.clone();
-            }
-        }
-    }
-
     // Draws a box. Duh.
     pub fn draw_box(
         &mut self,

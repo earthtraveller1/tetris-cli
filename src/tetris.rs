@@ -180,7 +180,8 @@ impl Tetris {
 
                 // Check that it is not colliding with fossilized blocks.
 
-                if let Some(_) = self.blocks[<i16 as TryInto<usize>>::try_into(block_y).unwrap()]
+                if let Some(_) = self.blocks
+                    [<i16 as TryInto<usize>>::try_into(block_y - 1).unwrap()]
                     [<i16 as TryInto<usize>>::try_into(block_x - 1).unwrap()]
                 {
                     within_x_bounds = false;
