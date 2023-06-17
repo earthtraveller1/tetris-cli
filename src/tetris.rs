@@ -5,8 +5,11 @@ use std::num::TryFromIntError;
 
 use crate::screen::{self, Pixel, Screen, Shape};
 
-pub const SCREEN_WIDTH: u32 = 10;
-pub const SCREEN_HEIGHT: u32 = 20;
+pub const GAME_WIDTH: u32 = 10;
+pub const GAME_HEIGHT: u32 = 20;
+
+pub const SCREEN_HEIGHT: u32 = 22;
+pub const SCREEN_WIDTH: u32 = 22;
 
 pub const PLAYER_STARTING_X: u16 = 5;
 pub const PLAYER_STARTING_Y: u16 = 3;
@@ -128,7 +131,7 @@ pub struct Tetris {
     player_x: u16,
     player_y: u16,
 
-    blocks: Vec<[Option<u8>; SCREEN_WIDTH as usize]>,
+    blocks: Vec<[Option<u8>; GAME_WIDTH as usize]>,
 
     current_shape: Option<Shape>,
 }
@@ -136,7 +139,7 @@ pub struct Tetris {
 impl Tetris {
     pub fn new() -> Result<Tetris, TryFromIntError> {
         Ok(Tetris {
-            screen: Screen::new(SCREEN_WIDTH + 2, SCREEN_HEIGHT + 2)?,
+            screen: Screen::new(SCREEN_WIDTH, SCREEN_HEIGHT)?,
             is_running: true,
 
             random_generator: RandomGenerator::new(101, 4, 1),
@@ -146,7 +149,7 @@ impl Tetris {
             player_x: PLAYER_STARTING_X,
             player_y: PLAYER_STARTING_Y,
 
-            blocks: vec![[None; SCREEN_WIDTH as usize]; SCREEN_HEIGHT as usize],
+            blocks: vec![[None; GAME_WIDTH as usize]; GAME_HEIGHT as usize],
 
             current_shape: None, // TODO: Select random shape
         })
@@ -168,12 +171,12 @@ impl Tetris {
                 let block_y: i16 =
                     block_y + <u16 as TryInto<i16>>::try_into(self.player_y).unwrap();
 
-                if block_y >= SCREEN_HEIGHT as i16 || block_y <= 0 {
+                if block_y >= GAME_HEIGHT as i16 || block_y <= 0 {
                     within_y_bounds = false;
                     return;
                 }
 
-                if block_x > SCREEN_WIDTH as i16 || block_x <= 0 {
+                if block_x > GAME_WIDTH as i16 || block_x <= 0 {
                     within_x_bounds = false;
                     return;
                 }
@@ -313,13 +316,19 @@ impl Tetris {
 
     pub fn render(&mut self) {
         self.screen.clear();
-        self.screen.fill_with_pixel(&Pixel {
-            shape: [crate::unicode::LIGHT_SHADE, ' '],
-            color: screen::Color::Basic(screen::colors::basic::BRIGHT_BLACK),
-        });
+        self.screen.fill_area_with_pixel(
+            &Pixel {
+                shape: [crate::unicode::LIGHT_SHADE, ' '],
+                color: screen::Color::Basic(screen::colors::basic::BRIGHT_BLACK),
+            },
+            1,
+            1,
+            1 + 10,
+            1 + 20,
+        );
 
         self.screen
-            .draw_box(0, 0, (SCREEN_WIDTH + 1) as u16, (SCREEN_HEIGHT + 1) as u16)
+            .draw_box(0, 0, (GAME_WIDTH + 1) as u16, (GAME_HEIGHT + 1) as u16)
             .unwrap();
 
         let current_shape = match self.current_shape.as_ref() {
@@ -340,7 +349,7 @@ impl Tetris {
 
         // Render the blocks onto the screen
         self.blocks.iter().enumerate().for_each(|(i, row)| {
-            for j in 0..SCREEN_WIDTH {
+            for j in 0..GAME_WIDTH {
                 if let Some(color) = row[<u32 as TryInto<usize>>::try_into(j).unwrap()] {
                     use crate::screen::Color;
                     use crate::unicode::FULL_BLOCK;
