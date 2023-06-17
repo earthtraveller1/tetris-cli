@@ -170,10 +170,12 @@ impl Tetris {
 
                 if block_y >= SCREEN_HEIGHT as i16 || block_y <= 0 {
                     within_y_bounds = false;
+                    return;
                 }
 
                 if block_x > SCREEN_WIDTH as i16 || block_x <= 0 {
                     within_x_bounds = false;
+                    return;
                 }
 
                 // Check that it is not colliding with fossilized blocks.
