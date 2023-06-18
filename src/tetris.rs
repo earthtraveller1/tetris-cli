@@ -360,6 +360,15 @@ impl Tetris {
         self.screen.draw_text(12, 1, "SCORE");
         self.screen.draw_text(12, 2, &format!("{}", self.score));
 
+        self.screen.draw_text(12, 4, "CONTROLS");
+        self.screen.draw_text(12, 5, "a => Move Left");
+        self.screen.draw_text(12, 6, "d => Move Right");
+        self.screen.draw_text(12, 7, "w => Rotate Right");
+        self.screen.draw_text(12, 8, "s => Rotate Left");
+        self.screen.draw_text(12, 9, "z => Flip Horizontally");
+        self.screen.draw_text(12, 10, "x => Flip Vertically");
+        self.screen.draw_text(12, 11, "[SPACE] => Drop");
+
         let current_shape = match self.current_shape.as_ref() {
             Some(shape) => shape,
             None => {
