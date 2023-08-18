@@ -322,14 +322,32 @@ impl Tetris {
                 }
                 'z' => {
                     if let Some(current_shape) = self.current_shape.as_mut() {
-                        current_shape.flip(true);
+                        current_shape.rotate(true);
+                        current_shape.rotate(true);
+
+                        // This is to prevent rotating the shape out of bounds.
+                        let (within_x_bounds, within_y_bounds) =
+                            current_shape.is_within_bounds(self.player_x, self.player_y);
+                        if !within_x_bounds || !within_y_bounds {
+                            // Undo the rotation if it results in the shape going out of bounds.
+                            current_shape.rotate(false);
+                        }
                     }
 
                     // Checks are not needed here, as it is impossible to flip out of bounds.
                 }
                 'x' => {
                     if let Some(current_shape) = self.current_shape.as_mut() {
-                        current_shape.flip(false);
+                        current_shape.rotate(false);
+                        current_shape.rotate(false);
+
+                        // This is to prevent rotating the shape out of bounds.
+                        let (within_x_bounds, within_y_bounds) =
+                            current_shape.is_within_bounds(self.player_x, self.player_y);
+                        if !within_x_bounds || !within_y_bounds {
+                            // Undo the rotation if it results in the shape going out of bounds.
+                            current_shape.rotate(true);
+                        }
                     }
 
                     // Checks are not needed here, as it is impossible to flip out of bounds.
