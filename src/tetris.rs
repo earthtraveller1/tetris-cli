@@ -8,8 +8,8 @@ use crate::screen::{self, Pixel, Screen, Shape};
 pub const GAME_WIDTH: u32 = 10;
 pub const GAME_HEIGHT: u32 = 20;
 
-pub const SCREEN_HEIGHT: u32 = 22;
-pub const SCREEN_WIDTH: u32 = 22;
+pub const SCREEN_HEIGHT: u32 = 25;
+pub const SCREEN_WIDTH: u32 = 30;
 
 pub const PLAYER_STARTING_X: u16 = 5;
 pub const PLAYER_STARTING_Y: u16 = 3;
@@ -325,6 +325,9 @@ impl Tetris {
                         current_shape.rotate(true);
                         current_shape.rotate(true);
 
+                        // false -> right
+                        // true -> left
+
                         // This is to prevent rotating the shape out of bounds.
                         let (within_x_bounds, within_y_bounds) =
                             current_shape.is_within_bounds(self.player_x, self.player_y);
@@ -383,8 +386,9 @@ impl Tetris {
         self.screen.draw_text(12, 6, "d => Move Right");
         self.screen.draw_text(12, 7, "w => Rotate Right");
         self.screen.draw_text(12, 8, "s => Rotate Left");
-        self.screen.draw_text(12, 9, "z => Flip Horizontally");
-        self.screen.draw_text(12, 10, "x => Flip Vertically");
+        self.screen.draw_text(12, 9, "z => Rotate left 180 degrees");
+        self.screen
+            .draw_text(12, 10, "x => Rotate right 180 degrees");
         self.screen.draw_text(12, 11, "[SPACE] => Drop");
 
         let current_shape = match self.current_shape.as_ref() {
