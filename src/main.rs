@@ -6,7 +6,7 @@ use std::thread;
 use std::time::Duration;
 use std::time::Instant;
 
-const FRAME_RATE: u8 = 30;
+const FRAME_RATE: u8 = 60;
 
 // Unicode literals that might be useful in future.
 mod unicode {
