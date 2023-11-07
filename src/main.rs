@@ -17,7 +17,7 @@ mod unicode {
     pub const BOX_DRAWINGS_LIGHT_HORIZONTAL: char = '\u{2500}';
     pub const BOX_DRAWINGS_LIGHT_VERTICAL: char = '\u{2502}';
 
-    // Box drawing corners
+    // Box drawing corners.
     pub const BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT: char = '\u{250C}';
     pub const BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT: char = '\u{2510}';
     pub const BOX_DRAWINGS_LIGHT_UP_AND_RIGHT: char = '\u{2514}';
