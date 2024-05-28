@@ -417,7 +417,9 @@ impl Tetris {
             .draw_text(GAME_WIDTH + 2, 9, "z => Rotate left 180 degrees");
         self.screen
             .draw_text(GAME_WIDTH + 2, 10, "x => Rotate right 180 degrees");
-        self.screen.draw_text(GAME_WIDTH + 2, 11, "[SPACE] => Drop");
+        self.screen
+            .draw_text(GAME_WIDTH + 2, 11, "h => Hold");
+        self.screen.draw_text(GAME_WIDTH + 2, 12, "[SPACE] => Drop");
 
         let hold_box_x = (GAME_WIDTH + 2) as u16;
         let hold_box_y = 13;
