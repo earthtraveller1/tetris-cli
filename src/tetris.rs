@@ -137,6 +137,7 @@ pub struct Tetris {
 
     blocks: Vec<[Option<u8>; GAME_WIDTH as usize]>,
 
+    previous_shape: Option<Shape>,
     current_shape: Option<Shape>,
     held_shape: Option<Shape>,
 
@@ -161,6 +162,7 @@ impl Tetris {
 
             blocks: vec![[None; GAME_WIDTH as usize]; GAME_HEIGHT as usize],
 
+            previous_shape: None,
             current_shape: None, // TODO: Select random shape
             held_shape: None,
             can_hold_shape: true,
@@ -225,7 +227,7 @@ impl Tetris {
                 };
             });
 
-            self.current_shape = None;
+            self.previous_shape = self.current_shape.take();
 
             let mut rows_cleared = 0;
 
@@ -417,8 +419,7 @@ impl Tetris {
             .draw_text(GAME_WIDTH + 2, 9, "z => Rotate left 180 degrees");
         self.screen
             .draw_text(GAME_WIDTH + 2, 10, "x => Rotate right 180 degrees");
-        self.screen
-            .draw_text(GAME_WIDTH + 2, 11, "h => Hold");
+        self.screen.draw_text(GAME_WIDTH + 2, 11, "h => Hold");
         self.screen.draw_text(GAME_WIDTH + 2, 12, "[SPACE] => Drop");
 
         let hold_box_x = (GAME_WIDTH + 2) as u16;
@@ -441,12 +442,24 @@ impl Tetris {
                 self.player_x = PLAYER_STARTING_X;
                 self.player_y = PLAYER_STARTING_Y;
 
-                self.current_shape = Some(
-                    SHAPES[<u64 as TryInto<usize>>::try_into(self.random_generator.generate())
+                self.current_shape = {
+                    loop {
+                        let generated_shape = SHAPES[<u64 as TryInto<usize>>::try_into(
+                            self.random_generator.generate(),
+                        )
                         .unwrap()
-                        % 7]
-                    .clone(),
-                );
+                            % 7]
+                        .clone();
+
+                        if let Some(previous_shape) = self.previous_shape.as_ref() {
+                            if generated_shape != *previous_shape {
+                                break Some(generated_shape)
+                            }
+                        } else {
+                            break Some(generated_shape)
+                        }
+                    }
+                };
 
                 // If the current shape is out of bounds as soon as it's spawned, then it's likely
                 // because the player has lost.
