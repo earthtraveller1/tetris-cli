@@ -268,8 +268,6 @@ impl Tetris {
                 self.player_y += 1;
             } else {
                 self.player_y -= 1;
-                self.fossilize_current_piece();
-
                 break;
             }
         }
@@ -386,7 +384,10 @@ impl Tetris {
                         self.can_hold_shape = false;
                     }
                 }
-                ' ' => self.fall_until_hit(),
+                ' ' => {
+                    self.fall_until_hit();
+                    self.fossilize_current_piece();
+                }
                 _ => (),
             }
         }
@@ -394,7 +395,7 @@ impl Tetris {
 
     pub fn render(&mut self) {
         self.screen.clear();
-        self.screen.fill_area_with_pixel(
+        /*self.screen.fill_area_with_pixel(
             &Pixel {
                 shape: [crate::unicode::LIGHT_SHADE, ' '],
                 color: screen::Color::Basic(screen::colors::basic::BRIGHT_BLACK),
@@ -403,7 +404,25 @@ impl Tetris {
             1,
             1 + 10,
             1 + 20,
-        );
+        );*/
+
+        let saved_y = self.player_y;
+
+        // Render the ghost piece
+        self.fall_until_hit();
+        if let Some(current_shape) = self.current_shape.as_ref() {
+            self.screen.draw_shape(
+                current_shape,
+                self.player_x,
+                // The y has to be offset because there are borders surroun-
+                // ding the screen, which will push everything down one uni-
+                // t.
+                self.player_y + 1,
+                true,
+            );
+        }
+
+        self.player_y = saved_y;
 
         self.screen
             .draw_box(0, 0, (GAME_WIDTH + 1) as u16, (GAME_HEIGHT + 1) as u16)
