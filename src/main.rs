@@ -41,7 +41,10 @@ fn main() {
             continue;
         }
 
-        let wait_duration = Duration::from_millis(1000 / FRAME_RATE as u64) - elapsed_time;
-        thread::sleep(wait_duration);
+        let target_frame_duration = Duration::from_millis(1000 / FRAME_RATE as u64);
+        if target_frame_duration > elapsed_time {
+            let wait_duration = target_frame_duration - elapsed_time;
+            thread::sleep(wait_duration);
+        }
     }
 }
