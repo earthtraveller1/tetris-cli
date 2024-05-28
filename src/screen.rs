@@ -10,7 +10,7 @@ use super::system::{termios as term, unistd};
 use std::ops::{Index, IndexMut};
 
 // A basic representation of a "pixel"
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct Pixel {
     // The shape of the pixel, as in what is printed out when the pixel is displayed.
     // It is a two-element array because every "pixel" takes up two characters on the
@@ -31,7 +31,7 @@ impl Default for Pixel {
 }
 
 // Support for RGB
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum Color {
     Default,
     Basic(u8), // Basic color support. Use for maximum compatibility. Only have 16 colors available.
@@ -225,7 +225,7 @@ impl Screen {
 const SHAPE_PIXEL_COUNT: usize = 4;
 
 // A struct for a shape.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct Shape {
     // The squares that are taken up by the shape, relative to the
     // shape itself.
