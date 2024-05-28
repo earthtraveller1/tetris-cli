@@ -377,6 +377,7 @@ impl Tetris {
                     if self.can_hold_shape {
                         let current_shape = self.current_shape.take();
                         self.current_shape = self.held_shape.take();
+                        self.previous_shape = current_shape.clone();
                         self.held_shape = current_shape;
 
                         self.can_hold_shape = false;
@@ -453,10 +454,10 @@ impl Tetris {
 
                         if let Some(previous_shape) = self.previous_shape.as_ref() {
                             if generated_shape != *previous_shape {
-                                break Some(generated_shape)
+                                break Some(generated_shape);
                             }
                         } else {
-                            break Some(generated_shape)
+                            break Some(generated_shape);
                         }
                     }
                 };
