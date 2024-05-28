@@ -124,9 +124,11 @@ pub struct Tetris {
 
     random_generator: RandomGenerator,
 
-    // This value is decremented every frame, and when it reaches the value of the framerate
+    // This value is incremented every frame, and when it reaches the value of the framerate
     // , it will be resetted back to zero and the playing piece will fall one unit down.
     fall_timer: u16,
+    // The rate at which the fall timer will be decremented per tick.
+    fall_speed: f32,
 
     player_x: u16,
     player_y: u16,
@@ -147,6 +149,7 @@ impl Tetris {
             random_generator: RandomGenerator::new(101, 4, 1),
 
             fall_timer: 0,
+            fall_speed: 1.0,
 
             player_x: PLAYER_STARTING_X,
             player_y: PLAYER_STARTING_Y,
@@ -239,7 +242,8 @@ impl Tetris {
                 i += 1;
             }
 
-            self.score += rows_cleared * 100;
+            self.score += rows_cleared * 100 + (rows_cleared - 1) * 25;
+            self.fall_speed += 0.01 * rows_cleared as f32;
         }
     }
 
@@ -258,7 +262,7 @@ impl Tetris {
     }
 
     pub fn update(&mut self) {
-        if self.fall_timer == <u8 as Into<u16>>::into(crate::FRAME_RATE) / 2 {
+        if self.fall_timer >= <u8 as Into<u16>>::into(crate::FRAME_RATE) / 2 {
             self.fall_timer = 0;
 
             // Only fall if we are not at the bottom.
@@ -271,7 +275,7 @@ impl Tetris {
             }
         }
 
-        self.fall_timer += 1;
+        self.fall_timer += self.fall_speed as u16;
 
         if let Ok(input) = self.screen.read_input() {
             match input {
