@@ -138,6 +138,9 @@ pub struct Tetris {
     blocks: Vec<[Option<u8>; GAME_WIDTH as usize]>,
 
     current_shape: Option<Shape>,
+    held_shape: Option<Shape>,
+
+    can_hold_shape: bool,
 }
 
 impl Tetris {
@@ -159,6 +162,8 @@ impl Tetris {
             blocks: vec![[None; GAME_WIDTH as usize]; GAME_HEIGHT as usize],
 
             current_shape: None, // TODO: Select random shape
+            held_shape: None,
+            can_hold_shape: true,
         })
     }
 
@@ -250,6 +255,8 @@ impl Tetris {
 
             self.fall_speed += 0.01 * rows_cleared as f32;
         }
+
+        self.can_hold_shape = true;
     }
 
     fn fall_until_hit(&mut self) {
@@ -364,6 +371,15 @@ impl Tetris {
 
                     // Checks are not needed here, as it is impossible to flip out of bounds.
                 }
+                'h' => {
+                    if self.can_hold_shape {
+                        let current_shape = self.current_shape.take();
+                        self.current_shape = self.held_shape.take();
+                        self.held_shape = current_shape;
+
+                        self.can_hold_shape = false;
+                    }
+                }
                 ' ' => self.fall_until_hit(),
                 _ => (),
             }
@@ -403,14 +419,19 @@ impl Tetris {
             .draw_text(GAME_WIDTH + 2, 10, "x => Rotate right 180 degrees");
         self.screen.draw_text(GAME_WIDTH + 2, 11, "[SPACE] => Drop");
 
+        let hold_box_x = (GAME_WIDTH + 2) as u16;
+        let hold_box_y = 13;
+        let hold_box_width = (GAME_HEIGHT - 13) as u16;
+        let hold_box_height = (GAME_HEIGHT - 13) as u16;
+
         self.screen
-            .draw_box(
-                (GAME_WIDTH + 2) as u16,
-                13,
-                (GAME_HEIGHT - 13) as u16,
-                (GAME_HEIGHT - 13) as u16,
-            )
+            .draw_box(hold_box_x, hold_box_y, hold_box_width, hold_box_height)
             .unwrap();
+
+        if let Some(held_shape) = self.held_shape.as_ref() {
+            self.screen
+                .draw_shape(&held_shape, hold_box_x + 4, hold_box_y + 4);
+        }
 
         let current_shape = match self.current_shape.as_ref() {
             Some(shape) => shape,
