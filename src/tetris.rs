@@ -242,7 +242,12 @@ impl Tetris {
                 i += 1;
             }
 
-            self.score += rows_cleared * 100 + (rows_cleared - 1) * 25;
+            self.score += rows_cleared * 100;
+
+            if rows_cleared > 0 {
+                self.score += (rows_cleared - 1) * 25
+            }
+
             self.fall_speed += 0.01 * rows_cleared as f32;
         }
     }
@@ -382,18 +387,30 @@ impl Tetris {
             .draw_box(0, 0, (GAME_WIDTH + 1) as u16, (GAME_HEIGHT + 1) as u16)
             .unwrap();
 
-        self.screen.draw_text(12, 1, "SCORE");
-        self.screen.draw_text(12, 2, &format!("{}", self.score));
-
-        self.screen.draw_text(12, 4, "CONTROLS");
-        self.screen.draw_text(12, 5, "a => Move Left");
-        self.screen.draw_text(12, 6, "d => Move Right");
-        self.screen.draw_text(12, 7, "w => Rotate Right");
-        self.screen.draw_text(12, 8, "s => Rotate Left");
-        self.screen.draw_text(12, 9, "z => Rotate left 180 degrees");
+        self.screen.draw_text(GAME_WIDTH + 2, 1, "SCORE");
         self.screen
-            .draw_text(12, 10, "x => Rotate right 180 degrees");
-        self.screen.draw_text(12, 11, "[SPACE] => Drop");
+            .draw_text(GAME_WIDTH + 2, 2, &format!("{}", self.score));
+
+        self.screen.draw_text(GAME_WIDTH + 2, 4, "CONTROLS");
+        self.screen.draw_text(GAME_WIDTH + 2, 5, "a => Move Left");
+        self.screen.draw_text(GAME_WIDTH + 2, 6, "d => Move Right");
+        self.screen
+            .draw_text(GAME_WIDTH + 2, 7, "w => Rotate Right");
+        self.screen.draw_text(GAME_WIDTH + 2, 8, "s => Rotate Left");
+        self.screen
+            .draw_text(GAME_WIDTH + 2, 9, "z => Rotate left 180 degrees");
+        self.screen
+            .draw_text(GAME_WIDTH + 2, 10, "x => Rotate right 180 degrees");
+        self.screen.draw_text(GAME_WIDTH + 2, 11, "[SPACE] => Drop");
+
+        self.screen
+            .draw_box(
+                (GAME_WIDTH + 2) as u16,
+                13,
+                (GAME_HEIGHT - 13) as u16,
+                (GAME_HEIGHT - 13) as u16,
+            )
+            .unwrap();
 
         let current_shape = match self.current_shape.as_ref() {
             Some(shape) => shape,
