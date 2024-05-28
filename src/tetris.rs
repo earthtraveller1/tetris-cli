@@ -255,7 +255,7 @@ impl Tetris {
                 self.score += (rows_cleared - 1) * 25
             }
 
-            self.fall_speed += 0.01 * rows_cleared as f32;
+            self.fall_speed += 0.1 * rows_cleared as f32;
         }
 
         self.can_hold_shape = true;
@@ -379,6 +379,9 @@ impl Tetris {
                         self.current_shape = self.held_shape.take();
                         self.previous_shape = current_shape.clone();
                         self.held_shape = current_shape;
+
+                        self.player_x = PLAYER_STARTING_X;
+                        self.player_y = PLAYER_STARTING_Y;
 
                         self.can_hold_shape = false;
                     }
