@@ -437,7 +437,7 @@ impl Tetris {
 
         if let Some(held_shape) = self.held_shape.as_ref() {
             self.screen
-                .draw_shape(&held_shape, hold_box_x + 4, hold_box_y + 4);
+                .draw_shape(&held_shape, hold_box_x + 4, hold_box_y + 4, false);
         }
 
         let current_shape = match self.current_shape.as_ref() {
@@ -493,7 +493,7 @@ impl Tetris {
         });
 
         self.screen
-            .draw_shape(current_shape, self.player_x, self.player_y);
+            .draw_shape(current_shape, self.player_x, self.player_y, false);
 
         self.screen.present();
     }

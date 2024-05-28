@@ -298,7 +298,7 @@ pub struct OutOfBoundsError {}
 // block.
 impl Screen {
     // Draws a shape.
-    pub fn draw_shape(&mut self, shape: &Shape, x_pos: u16, y_pos: u16) {
+    pub fn draw_shape(&mut self, shape: &Shape, x_pos: u16, y_pos: u16, ghost: bool) {
         let x_pos: i16 = x_pos.try_into().unwrap();
         let y_pos: i16 = y_pos.try_into().unwrap();
 
@@ -318,6 +318,11 @@ impl Screen {
             // guaranteed to be positive by this point, so this is safe (at least it
             // should be).
             self[real_x as u32][real_y as usize] = shape.fill_pixel.clone();
+
+            if ghost {
+                self[real_x as u32][real_y as usize].shape =
+                    [crate::unicode::LIGHT_SHADE, crate::unicode::LIGHT_SHADE];
+            }
         })
     }
 
